@@ -1,0 +1,104 @@
+---
+title: "Course index"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      comment = NA)
+
+```
+
+\
+
+
+```{r}
+library(dplyr)
+library(kableExtra)
+
+options(knitr.kable.NA = '')
+
+rio::import("teaching_plan.xlsx", sheet = "index") %>% 
+  filter(!is.na(session)) %>% 
+#  filter(topic_num == 2)  %>% 
+  mutate(slides = paste0("[", 
+                         slides_title, 
+                         "](",
+                         paste0(slides_filename, ifelse(topic_num == 1, ".R", ".html")), ")"
+         ),
+         exe_solution = paste0("[R script](", slides_filename, "_exe_solution.R)"),
+         exe_solution = ifelse(exes == "no", "", exe_solution)
+         ) -> d
+
+# pull(d, topic) %>% unique() 
+
+
+topic_tbl <- function(topic_name){
+  
+  d %>% 
+  filter(topic == topic_name) %>% 
+  select(Materials = slides, `Exercise solution` = exe_solution) %>% 
+  knitr::kable() %>% 
+  kable_styling(full_width = FALSE, position = "left", 
+                bootstrap_options = "condensed") %>% 
+    column_spec(1, width = "30em") %>% 
+    column_spec(2, width = "10em")
+}
+
+```
+
+
+## Software
+
+1. Install R from [CRAN](https://cran.r-project.org/) (choose appropriate version).
+
+2. Install [RStudio](https://www.rstudio.com/products/rstudio/download/), free Desktop version.
+
+3. Open RStudio.
+
+\
+
+
+```{r}
+downloadthis::download_file(
+      path = "data.zip",
+      button_label = "Download example datasets",
+      button_type = "primary",
+      has_icon = TRUE,
+      icon = "fa fa-save",
+      self_contained = FALSE)
+```
+
+\
+
+## R language basics
+`r topic_tbl("R language basics")`
+
+\
+
+## Working with dataframes
+`r topic_tbl("Working with dataframes")`
+
+\
+
+## Graphics
+`r topic_tbl("Graphics")`
+
+\
+
+## Comparing groups
+`r topic_tbl("Comparing groups")`
+
+\
+
+## Predictions
+`r topic_tbl("Predictions")`
+
+\
+
+## Miscellanea
+`r topic_tbl("Miscellanea")`
+
