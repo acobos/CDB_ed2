@@ -1,0 +1,112 @@
+---
+title: "Univariate graphics"
+subtitle: "with package `ggformula`"
+author: "Albert Cobos"
+output: 
+  ioslides_presentation:
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      comment = NA,
+                      fig.align='center')
+
+```
+
+
+## Data
+
+```{r}
+library(tidyverse)
+d <- rio::import("data/hta.xlsx", sheet = "data") %>% 
+  mutate(sex = factor(sex, 1:2, c("male", "female")),
+         smoke = factor(smoke, 1:4, c("current", "never", "ex-", "unknown")))
+
+```
+
+## Package `ggformula`
+
+Not part of the `tidyverse`
+
+```{r}
+library(ggformula)
+```
+
+\
+
+Based on `ggplot2` but easier:  
+
+- univariate:  $\qquad$  `gf_plot_type(~ var, data)`  
+- multivariate:  $\qquad$  `gf_plot_type(var1 ~ var2, data)`  
+
+\
+
+`data %>% gf_plot_type(...)`  
+
+## Barchart (counts)
+
+```{r }
+gf_bar(~ smoke, data = d)
+```
+
+
+## Barchart (counts or percents)
+
+```{r}
+library(patchwork)
+gf_bar(~ smoke, data = d) + gf_percents(~ smoke, data = d)
+```
+
+
+## Histogram (counts)
+
+```{r}
+gf_histogram(~ age, data = d)
+```
+
+
+## Histogram (counts or densities)
+
+```{r}
+gf_histogram(~ age, data = d) + gf_dhistogram(~ age, data = d)
+```
+
+## Histogram: bins and boundary
+
+```{r}
+gf_histogram(~ age, data = d, bins = 10) + 
+  gf_histogram(~ age, data = d, bins = 10, boundary = 30)
+```
+
+
+## Density
+
+```{r}
+gf_density(~ age, data = d) +
+  gf_dens(~ age, data = d)
+```
+
+
+## Boxplots (with color and fill)
+
+```{r fig.height=3}
+gf_boxplot( ~ weight, data = d, col = "blue") /
+  gf_boxplot( ~ weight, data = d, fill = "lightblue")
+```
+
+
+## Exercise
+
+1. Use `gf_barh()` to produce a barchart of region with blue lines and no fill (hint: `fill = NA`):
+    + what is the region that contributes more patients?
+    + and what is the region that contributes fewer patients?
+1. Same, but with blue fill and no lines.  
+1. Look at the distribution of the body mass index:  produce a density plots (top) and boxplots (bottom) in a single graphic output:  
+    + is the distribution unimodal? 
+    + is it symmetrical? 
+    + are there outliers?
+
+
