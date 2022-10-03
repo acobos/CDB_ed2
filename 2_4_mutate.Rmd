@@ -1,0 +1,173 @@
+---
+title: "Computing variables with `mutate()`"
+author: "Albert Cobos"
+output: 
+  ioslides_presentation:
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      comment = NA)
+
+```
+
+
+## General syntax
+
+`mutate(dataframe, varname = expression, varname = expression, ...)`
+
+Common cases:
+
+- Define factors for categorical vars
+- Compute numeric var with a formula  
+- Conditional assignment  
+- Categorize numeric var
+- Recoding 
+
+\
+
+```{r}
+library(dplyr)
+d <- rio::import("data/hta.xlsx", sheet = "data")
+```
+
+
+
+## Define factors
+
+```{r}
+d %>% 
+  mutate(sex = factor(sex, levels = 1:2, labels = c("male", "female")),
+         smoke = factor(smoke, 
+                        levels = 1:4, 
+                        labels = c("current smoker", "never smoker", 
+                                   "ex-smoker", "unknown")
+                        )
+         ) %>% 
+  select(sex, smoke) %>% head()
+
+```
+
+
+## Compute numeric var with a formula
+
+```{r}
+d %>% 
+  mutate(bmi = weight / height^2) %>%                       # body mass index
+  select(pid, weight, height, bmi) %>% head(3)               
+
+d %>% 
+  mutate(bmi = round(weight / height^2, 1)) %>%              # rounding to 1st decimal
+    select(pid, weight, height, bmi) %>% head(3)       
+```
+
+
+## Conditional assignment (simple)
+
+`if_else(logical_condition, value_if_TRUE, value_if_FALSE)`
+
+\
+
+Obesity is defined as a body mass index of $\hspace{4 mm}30 \hspace{2 mm} kg/m^2 \hspace{4 mm}$ or higher
+
+```{r}
+d %>% 
+  mutate(bmi = round(weight / height^2, 1),
+         obesity = if_else(bmi >= 30, "yes", "no")) %>%
+  select(pid, weight, height, bmi, obesity) %>% head()     
+```
+
+
+## Conditional assignment (complex)
+
+`case_when(logical_condition ~ value,`  
+&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; `logical_condition ~ value, ...)`
+
+
+```{r}
+d %>% 
+  mutate(x = case_when(dx_dm == 1 & sex == 1 ~ "diabetic male",
+                       dx_dm == 1 & sex == 2 ~ "diabetic female",
+                       dx_dm == 2 & sex == 1 ~ "non-diabetic male",
+                       dx_dm == 2 & sex == 2 ~ "non-diabetic female")) %>% 
+           select(dx_dm, sex, x) %>% head()
+```
+
+
+
+## Categorize a numeric var
+
+`cut(numeric_vector, breaks, ...)`
+
+\
+
+```{r}
+
+d %>% 
+  mutate(bmi = round(weight / height^2, 1),
+         who_ns = cut(bmi, 
+                      breaks = c(0, 18.5, 25, 30, 35, 40, Inf))) %>% 
+  select(weight, height, bmi, who_ns) %>% head(3)
+```
+
+`(25,30]`  means  *left-open* and *right-closed* interval: 30 is included, 25 is not.  
+
+What if we want the opposite?
+
+
+## Categorize a numeric var: *right-open* intervals
+
+```{r}
+
+d %>% 
+  mutate(bmi = round(weight / height^2, 1),
+         who_ns = cut(bmi, 
+                      breaks = c(0, 18.5, 25, 30, 35, 40, Inf),
+                      right = FALSE)) %>% 
+  select(weight, height, bmi, who_ns) %>% head()
+```
+
+What if we want custom labels?
+
+
+## Categorize a numeric var: custom labels
+
+```{r}
+
+d <- d %>% 
+  mutate(bmi = round(weight / height^2, 1),
+         who_ns = cut(bmi, 
+                      breaks = c(0, 18.5, 25, 30, 35, 40, Inf),
+                      right = FALSE,
+                      labels = c("Underweight", "Normal weight",
+                                 "Overweight", "Obesity class I",
+                                 "Obesity class II", "Obesity class III")
+                      ))  
+d %>% select(weight, height, bmi, who_ns) %>% head()
+```
+
+
+
+## Exercises
+
+Create dataframe `demo` with variables `pid`, `region`, `sex`, `age`, `smoke`, `height` and `weight`, and:
+
+1. compute the body mass index, rounded to first decimal.
+1. create a logical indicator for obesity; hint: use `if_else(..., TRUE, FALSE)`.
+1. create variable `age_group` to group ages in the following categories, labeling them as "young", "mature", "old", respectively: 
+    + less than 40 
+    + 40 to less than 65 
+    + 65 or more  
+
+1. redefine `smoke` as "current or ex-smoker", "never smoker", or "unknown".
+1. define factors for all categorical variables.
+
+
+
+
+ 
+
+

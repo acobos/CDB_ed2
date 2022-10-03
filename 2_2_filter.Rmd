@@ -1,0 +1,118 @@
+---
+title: "Subsetting observations"
+author: "Albert Cobos"
+output: 
+  ioslides_presentation:
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      comment = NA)
+
+library(dplyr)
+d <- rio::import("data/hta.xlsx", sheet = "data") 
+
+```
+
+
+## Several `dplyr` functions
+
+--------------    ----------------------------------------------------------------
+`slice()`         based on position of rows
+`slice_min()`     based lowest values in a variable
+`slice_max()`     based highest values in a variable
+`sample_n()`      random selection
+`filter()`        based on a logical expression (*)
+--------------    ----------------------------------------------------------------
+
+\
+
+(*) something that resolves to a logical value (TRUE or FALSE)
+
+- relational operators:  $\qquad$ < &nbsp; , &nbsp; > &nbsp; , &nbsp; <= &nbsp; , &nbsp; >= &nbsp; , &nbsp; == &nbsp; , &nbsp; !=
+
+- may be combined with logical operators:  $\qquad$  & &nbsp; , &nbsp; | &nbsp; , &nbsp; !
+
+
+## Based on a logical expression
+
+```{r}
+demo <- select(d, pid, sex, age, region)             # easier to see with fewer vars
+
+```
+
+\
+
+`filter(dataframe, logical_condition)` 
+
+```{r}
+filter(demo, age > 90)                               # simple condition
+```
+
+
+## Based on a logical expression
+
+`filter(dataframe, logical_condition)` 
+
+```{r}
+filter(demo, sex == 1 & age > 85)                    # complex condition
+```
+
+
+
+## Based on a logical expression
+
+`filter(dataframe, logical_condition)` 
+
+```{r}
+filter(demo, is.na(sex))                             # sex is missing
+```
+
+
+## Based on a logical expression
+
+`filter(dataframe, logical_condition)` 
+
+```{r}
+filter(demo, !is.na(sex))                            # sex is NOT missing
+```
+
+## Based on position of rows
+
+`slice(dataframe, row_selection)` 
+
+```{r}
+slice(demo, 1:10)
+```
+
+`row_selection` can be any numeric vector of integers
+
+## Lowest or highest values in a variable
+
+`slice_min(dataframe, variable, n)`   
+`slice_max(dataframe, variable, n)`
+
+```{r}
+slice_min(demo, age, n = 3)                   # 3 obs with lowest age
+slice_max(demo, age, n = 3)                   # 3 obs with highest age
+```
+
+## Random sample
+
+`sample_n(dataframe, n)`   
+
+```{r}
+set.seed(1)                                   # for reproducibility
+sample_n(demo, 10)                            # random selection of 10 obs
+```
+
+## Exercises
+
+1. Subset current smokers
+1. Subset current smokers or ex-smokers
+1. Same, but younger than 65
+1. Subset the 10 youngest patients
+1. Get a random sample of size 100

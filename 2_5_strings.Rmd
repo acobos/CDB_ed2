@@ -1,0 +1,179 @@
+---
+title: "Strings"
+author: "Albert Cobos"
+output: 
+  ioslides_presentation:
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      comment = NA)
+
+
+```
+
+
+## Common problems
+
+```{r}
+library(tidyverse)
+
+antec <- c("Arterial hypertension", "arterial hypertension", "ARTERIAL HYPERTENSION",
+       "arterial   hypertension ", "arterial hypertension ",  "Pneumonia", 
+       "pneumonia", " pneumonia")
+
+data.frame(antec) %>% count(antec)
+```
+
+
+## Whitespaces (ws)
+
+```{r}
+str_trim(antec)                            # removes leadin/trailing ws
+```
+
+\
+
+```{r}
+str_squish(antec)                          # also removes excessive ws between words
+```
+
+
+## Capitalization
+
+```{r}
+str_to_upper(antec)                        # converts to uppercase
+```
+
+\
+
+```{r}
+str_to_sentence(antec)                     # capitalizes first letter
+```
+
+
+## Several operations
+
+```{r}
+
+str_to_sentence(str_squish(antec))
+antec %>% str_squish() %>% str_to_sentence()
+antec %>% str_squish() %>% str_to_sentence() %>% unique()
+```
+
+
+## Substrings
+
+```{r}
+x <- c("FEGA0720525000", "ROMA1680913000", "PEJI0590503")
+```
+
+\
+
+```{r}
+str_sub(x, start = 5, end = 5)          # extracts sex code
+```
+
+\
+
+```{r}
+str_sub(x, start = 6, end = 11)         # extracts birthdate
+```
+
+
+## Matching patterns
+
+```{r}
+x <- c("diabetes mellitus",  "asthma", "bronchial asthma + DM.")
+```
+
+\
+
+```{r}
+str_detect(x, pattern = "asthma")                                      # detect pattern
+```
+
+\
+
+```{r}
+str_replace(x, pattern = "DM", replacement = "diabetes mellitus")      # detect and replace
+```
+
+
+
+## Matching patterns: care with special characters!
+
+```{r}
+x <- c("diabetes mellitus",  "asthma", "bronchial asthma + DM.")
+```
+
+\
+
+```{r}
+str_detect(x, ".")                                # unexpected result !
+```
+
+\
+
+```{r}
+str_detect(x, fixed("."))                         # OK
+```
+
+
+## Other useful functions
+
+```{r}
+x <- c("asthma", "diabetes mellitus", "preunomia")
+length(x)
+```
+
+
+```{r}
+str_length(x)                                     # counts number of characters 
+```
+
+\
+
+```{r}
+str_flatten(x, collapse = ", ")
+```
+
+## Other useful functions
+
+```{r}
+age <-  c(35, 48) 
+sex <- c("male", "female")
+antec <-  c("AHT", "DM")
+str_glue("This is a {age} years {sex}, diagnosed with {antec}")
+```
+
+\
+
+```{r}
+data.frame(age, sex, antec) %>% 
+  mutate(narrative = str_glue("This is a {age} years {sex}, diagnosed with {antec}"))
+
+```
+
+## Exercise
+
+1. With antecedents below, create a data.frame and produce a proper frequency table. 
+
+    ```{r}
+    antec <- c("Arterial hypertension", "arterial hypertension", "ARTERIAL HYPERTENSION",
+           "arterial   hypertension ", "arterial hypertension ",  "Pneumonia", 
+           "pneumonia", " pneumonia")
+    ```
+
+1. With the cip codes below, create a data.frame and compute variables `sex` (with appropriate labels) and `year_of_birth` (should be numeric). Hint: to convert a character vector into a numeric vector, use `as.numeric()`.
+
+    ```{r}
+    cip <- c("FEGA0720525000", "ROMA1690913000", "PEJI0910503")
+    ```
+
+1. With the DISEHTAE data, compute an additional column having this value for the first patient:  "A 52 years male, diagnosed with AHT on 1998-01-01".  
+Hint: in `str_glue()`, factors need to be converted to character, as in:  
+`str_glue("This is a {as.character(sex)} patient")`

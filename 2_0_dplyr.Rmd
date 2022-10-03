@@ -1,0 +1,51 @@
+---
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      comment = NA)
+
+```
+
+## Package `dplyr`
+
+A package with functions to manipulate *dataframes*. 
+
+\
+
+
+Some basic `dplyr` functions:
+
+- `select()`  $\qquad$   to subset variables (columns) of a dataframe 
+
+- `filter()`  $\qquad$   to subset observations (rows) of a dataframe  
+
+- `mutate()`  $\qquad$   to compute new variables (or redefine existing ones)
+
+- `rename()`  $\qquad$   to change the name of variables  
+
+- `arrange()` $\qquad$   to sort by one or more vars
+
+
+\
+
+Load `dplyr` to make its functions available: 
+
+```{r}
+library(dplyr)
+```
+
+
+\
+
+Package `dplyr` is part of the [tidyverse](https://www.tidyverse.org/), a very useful collection of packages, and a package itself. 
+
+You can also load `dplyr` (and other packages of the tidyverse) by loading the `tidyverse` package:
+
+```{r}
+library(tidyverse)
+```
+

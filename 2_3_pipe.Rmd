@@ -1,0 +1,94 @@
+---
+title: "Chaining operations"
+author: "Albert Cobos"
+output: 
+  ioslides_presentation:
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      comment = NA)
+
+library(dplyr)
+d <- rio::import("data/hta.xlsx", sheet = "data") 
+
+```
+
+
+## Chaining operations with `%>%`
+
+Suppose we want to select demographic data for women only.
+
+```{r results='hide'}
+demo <- select(d, pid, age, sex)                       # option 1
+filter(demo, sex == 2)
+
+filter(select(d, pid, age, sex), sex == 2)             # option 2
+
+d %>%                                                  # option 3
+  select(pid, age, sex) %>% 
+  filter(sex == 2)
+
+```
+
+Read $\quad$ `%>%` $\quad$ as $\quad$ *then*:
+
+take `d` $\quad$ *then*  
+$\quad$ `select` pid, age, sex $\quad$ *then*  
+$\quad$ `filter` females
+  
+## The *pipe* operator
+
+`%>%` is called the *pipe* operator
+
+The *first* argument of a function can be extracted and put *before* the pipe:
+
+<center>
+`x %>% f()`  $\qquad \equiv \qquad$  `f(x)`
+</center>
+
+\
+
+If a function takes several arguments, *the first one* can be put before the pipe:
+
+<center>
+`x %>% f(y, z, ...)`  $\qquad \equiv \qquad$  `f(x, y, z, ...)`
+</center>
+
+## Examples
+
+```{r}
+round(pi, 4)
+pi %>% round(4)
+log(10) 
+10 %>% log()
+```
+
+## Examples
+
+Most `dplyr` functions take a dataframe as first argument, and produce a dataframe as result. Therefore, they can be chained.
+
+```{r}
+d %>%                                   # take demo, THEN           
+  select(pid, age, sex) %>%             # select pid, age and sex, THEN
+  filter(sex == 2) %>%                  # filter females, THEN
+  head()                                # print 6 first rows only
+```
+
+You can chain *any* number of operations
+
+## Exercises
+
+Use the pipe to chain operations needed in each case:
+
+1. Subset patients from Catalunya and select variables `pid`, `age`, and `sex`
+1. Could you do the same inverting the order of operations? 
+    + first select variables, 
+    + then filter cases from Catalunya
+  
+1. Same, but sort cases by age; hint: see `?arrange`
+1. Same, but sorting by decreasing age; hint: see `?arrange`, second example.
+1. Same but sorting by sex and decreasing age

@@ -1,0 +1,120 @@
+---
+title: "Subsetting variables with `select()`"
+author: "Albert Cobos"
+output: 
+  ioslides_presentation:
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      comment = NA)
+
+```
+
+## General syntax
+
+`select(dataframe, var_selection)`
+
+\
+
+- First argument:  dataframe to select vars from  
+- Further arguments:  expression(s) indicating vars to be selected (comma-separated if more than one)  
+
+- Result:  dataframe with selected vars only (and all rows)
+
+
+## List variables (comma separated)
+
+```{r}
+library(dplyr)
+d <- rio::import("data/hta.xlsx", sheet = "data") 
+
+select(d, pid, region, age, sex)  %>%  head()
+
+```
+
+\
+
+`%>% head()`  is to print only the first 6 rows (more on this later).
+
+
+
+## Range of (consecutive) variables
+
+```{r }
+select(d, pid:sex)  %>%  head() 
+```
+
+
+## Exclude a variable
+
+```{r }
+select(d, pid:sex, -data_xtract_dt) %>%  head() 
+```
+
+
+## Helper functions  
+
+To write expressions indicating the vars to be selected
+
+Based on a part of the variable name  
+- `contains()`  
+- `starts_with()`  
+- `ends_with()`  
+- `num_range()`   
+    
+Based on a character vector of variable names  
+- `all_of()`  
+- `any_of()`  
+    
+- ... 
+
+## Parts of var name
+
+```{r }
+select(d, pid, contains("dx"))  %>% head(2)                    # vars containing "dx"
+```
+
+```{r }
+select(d, pid, starts_with("dx"))  %>% head(2)                 # vars starting with "dx"
+```
+
+```{r}
+select(d, ends_with("dt"))   %>% head(2)                       # vars ending with "dt" 
+```
+
+## Parts of var name 
+
+`num_range(fixed_part, range_for_suffix)`
+
+\
+
+```{r}
+select(d, num_range("sbp_v", 1:3)) %>% head(2)                 # SBP repetitions 1 to 3
+select(d, num_range("dbp_v", 2:5)) %>% head(2)                 # DBP repetitions 2 to 5
+```
+
+
+## Variable names in a character vector
+
+```{r}
+demovars <- c("pid", "age", "sex", "region")                   # character vector
+demovars
+
+select(d, any_of(demovars)) %>% head()
+
+```
+
+
+## Exercises
+
+From dataframe `d`:
+
+1. Select `pid` and all BP vars using `contains()`, and save as `bp` 
+1. Select all variables excluding all BP variables, and save as `non_bp`
+1. Select `pid` and all diagnostics using `starts_with()`, and print first 6 rows
+1. Select `pid` and all dates, and print first 6 rows
+1. Select `pid` and all treatment variables (`lmr` to `other`), and print first 6 rows

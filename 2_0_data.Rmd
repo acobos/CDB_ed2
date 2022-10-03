@@ -1,0 +1,49 @@
+---
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      comment = NA)
+
+library(tidyverse)
+library(kableExtra)
+
+```
+
+## Data
+
+- Random sub-sample (n = 500) of the [DISEHTAE study](https://www.sciencedirect.com/science/article/abs/pii/S1889183709000828?via%3Dihub) patients.
+
+- Excel file (`hta.xlsx`) with two sheets: `data` and `variables`
+
+
+
+
+```{r echo = FALSE}
+rio::import("data/hta.xlsx", sheet = "variables") %>%
+  mutate(coding = ifelse(is.na(coding)," ", coding)) %>% 
+  kbl(caption = "Variables in the dataset") %>% 
+  kable_classic(c("striped", "condensed"), full_width = F, font_size = 12, fixed_thead = T) %>% 
+  column_spec(1, bold=T, width = "8em") %>% 
+  column_spec(2, width = "25em") %>%
+  column_spec(3, width = "30em")  %>% 
+  row_spec(0, bold=T, background = "Lightgray") %>% 
+  row_spec(6, extra_css = "border-bottom: 1px solid;") %>% 
+  row_spec(18, extra_css = "border-bottom: 1px solid;") %>% 
+  row_spec(31, extra_css = "border-bottom: 1px solid;")
+
+```
+
+<br>
+
+- To read the data, use function `import()` from package `rio`:
+
+```{r }
+d <- rio::import("data/hta.xlsx", sheet = "data")         
+
+```
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>

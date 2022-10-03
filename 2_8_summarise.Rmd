@@ -1,0 +1,143 @@
+---
+title: "Summarising rows"
+author: "Albert Cobos"
+output: 
+  ioslides_presentation:
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      comment = NA)
+
+```
+
+
+## Summarising all rows
+
+`summarise(data, varname = function(var), ....)`
+
+```{r}
+library(tidyverse)
+demo <- rio::import("data/hta.xlsx", sheet = "data") %>% 
+  mutate(smoke = factor(smoke, 1:4, c("current", "never", "ex", "unknown")),
+         sex = factor(sex, 1:2, c("male", "female"))) %>% 
+  select(pid, age, sex, smoke) %>% 
+  na.omit()
+
+demo %>% 
+  summarise(age_mean = mean(age),
+            age_sd   = sd(age),
+            cases = n()) 
+
+```
+
+
+## Summarising groups of rows
+
+`group_by(data, var, ...)`  
+`summarise(data, varname = function(var), ....)`
+
+```{r}
+demo %>% 
+  group_by(smoke) %>% 
+  summarise(age_mean = mean(age),
+            age_sd   = sd(age),
+            cases = n()) 
+
+```
+
+
+## Grouping rows by more than one variable
+
+```{r}
+demo %>% 
+  group_by(smoke, sex) %>% 
+  summarise(age_mean = mean(age),
+            age_sd   = sd(age),
+            cases = n()) 
+
+```
+
+
+## Blood pressure in tidy format
+
+```{r}
+bp <- rio::import("data/hta.xlsx", sheet = "data") %>% 
+  select(pid, sbp_v1:dbp_v6) %>% 
+  pivot_longer(sbp_v1:dbp_v6) %>% 
+  separate(name, into = c("var", "visit")) %>% 
+  pivot_wider(names_from = var) %>% 
+  na.omit() 
+
+head(bp)
+
+```
+
+
+## Getting fist row in each group
+
+`first(var, ...)`
+
+```{r}
+bp %>% 
+  arrange(pid, visit) %>% 
+  group_by(pid) %>% 
+  summarise(sbp_first = first(sbp),
+            dbp_first = first(dbp)) %>% 
+  head()
+```
+
+## Getting last row in each group
+
+`last(var, ...)`
+
+```{r}
+bp %>% 
+  arrange(pid, visit) %>% 
+  group_by(pid) %>% 
+  summarise(sbp_last = last(sbp),
+            dbp_last = last(dbp)) %>% 
+  head()
+```
+
+
+## Getting nth row in each group
+
+`nth(var, n, ...)`
+
+```{r}
+bp %>% 
+  arrange(pid, visit) %>% 
+  group_by(pid) %>% 
+  summarise(sbp_3 = nth(sbp, 3),
+            dbp_3 = nth(dbp, 3)) %>% 
+  head()
+```
+
+
+## Counting values of categorical variables
+
+`count(data, var, ...)`
+
+```{r}
+demo %>% count(sex)
+demo %>% count(sex, smoke)
+```
+
+
+## Exercises
+
+1. Count the number of men and women for each region.
+
+1. Count the number of diabetic patients of each sex.
+
+1. Get blood pressure data in tidy format (`pid`, `visit`, `sbp` and `dbp`) and discard the first three visits; with the remaining visits, compute for each patient:
+    + the mean values of SBP and DBP.
+    + the number of rows used to compute each of the means.
+    
+1. Starting with drug treatments in long format, compute the number of drugs taken by each patient.
+
+1. What is the most frequent number of drugs prescribed to a patient? How many patients had just one drug prescribed? And how many had two, or three? Is there any patient with more than three drugs? 

@@ -1,0 +1,130 @@
+---
+title: "Dates"
+author: "Albert Cobos"
+output: 
+  ioslides_presentation:
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      comment = NA)
+
+
+```
+
+
+## Common problems in reading dates
+
+```{r}
+d <- rio::import("data/dates.xlsx") 
+d
+class(d$dob); class(d$v1); class(d$v2)
+```
+
+
+## Defining dates as `Date` ojects
+
+```{r}
+library(tidyverse)
+dd <- d %>% 
+  mutate(dob = as.Date(dob),
+         v1 = as.Date(v1, format = "%d/%m/%Y"),           # see ?strptime
+         v2 = lubridate::dmy(v2))
+dd
+sapply(dd, class)
+```
+
+## Getting components of `Date` objects
+
+```{r}
+library(lubridate)
+
+dd %>% 
+  select(dob) %>% 
+  mutate(dob_year = year(dob),
+         dob_month1 = month(dob),
+         dob_month2 = month(dob, label = TRUE),
+         dob_day = day(dob),
+         dob_wday1 = wday(dob, label = TRUE),
+         dob_wday2 = wday(dob, label = TRUE, abbr=FALSE))
+
+```
+
+## Computing intervals
+
+```{r}
+ddd <- dd %>% 
+  select(-v2) %>% 
+  mutate(dif1 = v1 - dob,
+         dif2 = as.numeric(v1 - dob),
+         age_at_v1 = trunc(as.numeric(v1 - dob)/365.25))
+ddd
+sapply(ddd, class)
+```
+
+
+## Shifting dates
+
+```{r}
+enrollment <- as.Date("2022-01-07")
+
+intervals <- 30 * 0:6
+intervals
+
+enrollment + intervals
+enrollment + months(0:6)
+
+```
+
+## Shifting dates: non-existing dates
+
+```{r}
+enrollment <- as.Date("2022-01-31")
+
+enrollment + months(0:6)
+enrollment %m+% months(0:6)
+
+
+
+```
+
+## Shifting dates: non-existing dates
+
+```{r}
+leap_year(2020)
+as.Date("2020-02-29") + years(0:5)
+as.Date("2020-02-29") %m+% years(0:5)
+```
+
+
+## Date intervals and overlapping
+
+```{r}
+treatment_phase <- interval("2021-01-01", "2021-03-31")
+steroids <- interval("2020-12-15", "2020-12-31")
+statins <- interval("2021-02-15", today())
+
+int_overlaps(treatment_phase, steroids)
+int_overlaps(treatment_phase, statins)
+```
+
+## Exercise
+
+1. With the DISEHTAE data:
+    + What is the class of `ah_dx_dt` and `data_xtract_dt`?
+    + Convert them to to `Date` objects.
+    + Compute the years from the AHT diagnostic to the data extraction date.
+    + Create a new variable for the week day of the data extraction date.
+    
+1. Use the `lubridate` function `dmy()` to define a `Date` object from the following character vector. Did it work?  
+
+```{r}
+x <- c("05-mar-58", "2/12/57", "28-12-91", "7/jun/93")
+```
+
+
+
+
