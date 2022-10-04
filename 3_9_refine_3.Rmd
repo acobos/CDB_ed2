@@ -1,0 +1,172 @@
+---
+title: "Refining graphics 3"
+subtitle: "with package `ggformula`"
+author: "Albert Cobos"
+output: 
+  ioslides_presentation:
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      comment = NA,
+                      fig.align='center', 
+                      fig.width = 10,
+                      fig.height = 4)
+
+```
+
+
+## Data
+
+```{r}
+library(tidyverse)
+library(ggformula)
+library(patchwork)
+
+d <- rio::import("data/labs.xlsx") %>% 
+tidyr::pivot_wider(values_from = "value", names_from = "var")
+
+head(d, 4)
+```
+
+
+## Transformations
+
+
+```{r}
+gf_density(~ GGT, data = d, fill = ~treatment) +
+gf_boxplot(GGT ~ treatment, data = d, fill = ~treatment) 
+
+```
+
+## Transformations of coordinates
+
+```{r}
+gf_boxplot(GGT ~ treatment, data = d, fill = ~treatment) +
+gf_boxplot(GGT ~ treatment, data = d, fill = ~treatment) %>% 
+  gf_refine(coord_trans(y = "log10"))
+
+```
+
+
+## Transformations: scale
+
+```{r}
+gf_boxplot(GGT ~ treatment, data = d, fill = ~treatment) %>% 
+  gf_refine(scale_y_log10()) +
+gf_boxplot(log10(GGT) ~ treatment, data = d, fill = ~treatment)
+
+```
+
+
+## Colors
+
+```{r fig.height = 3}
+p <- gf_boxplot(GGT ~ treatment, data = d, color = ~treatment) 
+p %>% gf_refine(scale_color_manual(values = c("orange", "darkblue"))) +
+p %>% gf_refine(scale_color_manual(values = c("#FFA500", "#00008B")))
+```
+
+- See available color names with `colors()`
+
+
+
+## Color palettes  $\quad$ (`RColorBrewer` and more)
+
+```{r fig.height = 2.5}
+library(RColorBrewer)
+p %>% gf_refine(scale_color_brewer(palette="Dark2"),
+                coord_flip()) 
+
+```
+
+- See all RColorBrewer palettes with `RColorBrewer::display.brewer.all()`
+
+- Many other palettes available through package
+[`paletteer`](https://emilhvitfeldt.github.io/paletteer/) 
+
+
+
+## More on graphics
+
+`ggformula`: $\quad$ RStudio tutorials and [this article](http://www.mosaic-web.org/ggformula/articles/pkgdown/ggformula-long.html)
+
+`ggplot2`:
+
+- [A ggplot2 tutorial for beautiful plotting in R](https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/), by Cédric Sherer.
+
+- [Introduction to data visualization with ggplot2](https://www.datacamp.com/courses/introduction-to-data-visualization-with-ggplot2), Datacamp online course.
+
+- [The R graph gallery](https://r-graph-gallery.com/), by Yan Holtz.
+
+\
+
+`ggpubr`: $\quad$ [Publication Ready Plots](http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/).
+
+\
+
+Other plotting systems in R: $\quad$ [Base R](http://www.sthda.com/english/wiki/r-base-graphs) and [`lattice`](http://www.sthda.com/english/wiki/lattice-graphs).
+
+
+## Exercise {.smaller}
+
+- Run this code to read the `OSAS.xls` data and compute `ccg`, a grouped version of the cervical circumference.  In the R graph gallery, look for the type of graphic shown below. Copy the code of the __Most basic ridgeline__, and adapt it to produce the graphic shown below.
+
+```{r}
+d <- rio::import("data/OSAS.xls")  %>% 
+  mutate(ccg = cut(cervical_circumference, breaks = c(30, 38.5, 41.5, 44, 55)))
+```
+
+
+```{r echo = FALSE}
+library(ggridges)
+library(ggplot2)
+
+d %>% 
+  ggplot(aes(x = ahi, y = ccg, fill = ccg)) +
+  geom_density_ridges() +
+  theme(legend.position = "none")
+```
+
+
+## Exercise (cont.) {.smaller}
+
+- Install package `ggpubr`. Then look at the first example in [this tutorial](http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/76-add-p-values-and-significance-levels-to-ggplots/#compare-two-independent-groups), and try to produce the graphics below. 
+
+```{r echo = FALSE}
+library(ggpubr)
+d %>% 
+  mutate(gender = factor(gender, 0:1, c("female", "male"))) %>% 
+  gf_boxplot(ahi ~ gender, fill = ~gender) %>% 
+  gf_refine(stat_compare_means()) +
+
+d %>% 
+  gf_boxplot(ahi ~ ccg, fill = ~ccg) %>% 
+  gf_refine(stat_compare_means())
+```
+
+
+## Review exercise 
+
+- Produce this graphic with the `aht.xls` data.  
+Hint: use `show_col(hue_pal()(2))` to see how to specify the colors for the reference lines.
+
+```{r echo = FALSE}
+d <- rio::import("data/hta.xlsx") %>% 
+  select(pid, sbp_v1:dbp_v6) %>%
+  pivot_longer(sbp_v1:dbp_v6, names_to = "var", values_to = "bp")  %>% 
+  na.omit() %>% 
+  separate(var, into = c("variable", "visit")) 
+
+library(ggformula)
+gf_boxplot(bp ~ visit, fill = ~fct_rev(variable), data = d) %>% 
+  gf_hline(yintercept = 140, lty = 2, col = "#F8766D") %>% 
+  gf_hline(yintercept = 90, lty = 2, col = "#00BFC4") %>% 
+  gf_labs(y = "BP (mmHg") %>% 
+  gf_theme(legend.title = element_blank())
+```
+
+

@@ -1,0 +1,148 @@
+---
+title: "Other plots"
+subtitle: "(several packages)"
+author: "Albert Cobos"
+output: 
+  ioslides_presentation:
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      comment = NA,
+                      fig.align='center', 
+                      fig.width = 10,
+                      fig.height = 4)
+
+```
+
+
+## Data
+
+[Coronavirus: the first three months as it happened. Nature 2020 Apr](https://www.nature.com/articles/d41586-020-00154-w)
+
+```{r}
+library(tidyverse)
+
+d <- rio::import("data/covid_symptoms.xlsx") %>% 
+  select(-symptoms) %>% 
+  uncount(count) %>% 
+  mutate(case = row_number()) %>% 
+  select(case, everything())
+
+head(d, 5)
+
+```
+
+
+## Venn diagrams (dichotomous vars)
+
+```{r}
+
+library(ggvenn)
+ggvenn(list(Fatigue = d %>% filter(Fatigue) %>% pull(case), 
+          Cough = d %>% filter(Cough) %>% pull(case),
+          Fever = d %>% filter(Fever) %>% pull(case)), 
+  fill_color = c("darkorange", "darkcyan", "darkgreen"), stroke_size = 0.5, set_name_size = 5)
+
+```
+
+
+## UpSet plot (signs & symptoms)
+
+```{r}
+library(ComplexUpset)
+ds <- d %>% select(-case) 
+upset(data = ds, intersect = names(ds), width_ratio = 0.125, name = "Symptoms") +
+  labs(title = "Co-Occurence of COVID-19 Symptoms (n = 1764)")
+```
+
+
+## Mosaic plots (categorical vars)
+
+```{r}
+library(vcd)
+mosaic(Improved ~ Treatment | Sex, data = Arthritis, 
+       zero_size = 0, highlighting_direction = "right")
+```
+
+
+## Likert scales (ordinal vars) 
+
+```{r}
+library(likert); data(pisaitems); 
+d <-  pisaitems %>% select(contains("ST24Q")) 
+names(d) <- c("I read only if I have to", 
+              "Reading is one of my favourite hobbies", 
+              "I like talking about books with other people", 
+              "I find it hard to fard to finish books", 
+              "I feel happy if I receive a book as present", 
+              "For me reading is a waste of time", 
+              "I enjoy going to a bookstore or a library", 
+              "I read only to get information I need",
+              "I cannot sit still and read for more than a few minutes", 
+              "I like to express my opinions about books I have read", 
+              "I like to exchange books with my friends")
+```
+
+Items on reading attitudes (strongly disagree, disagree, agree, strongly agree)
+
+
+## Likert scales (ordinal vars)
+
+```{r}
+
+likert(d) %>% 
+  plot(legend.position = "right")
+
+```
+
+## QQ plot (quantitative var, assess normality)
+
+```{r}
+library(tidyverse); library(ggformula); library(patchwork)
+gf_qq(~bwt, data = MASS::birthwt, title = "Birth weight (g)") %>% gf_qqline() +
+gf_density(~bwt, data = MASS::birthwt) /
+gf_boxplot(~bwt, data = MASS::birthwt)
+```
+
+## QQ plot (quantitative var, assess normality)
+
+```{r}
+gf_qq(~lwt, data = MASS::birthwt, title = "Mother's weight (pounds)") %>% gf_qqline() +
+gf_density(~lwt, data = MASS::birthwt) /
+gf_boxplot(~lwt, data = MASS::birthwt)
+```
+
+
+
+## Exercise {.smaller}
+
+1. Run the following code to get the Titatic data in a dataframe where each row is a person:
+
+    ```{r}
+    d <- Titanic %>% as_tibble() %>% tidyr::uncount(n)
+    ```
+
+    Then produce mosaic plots, and interpret the result, to explore survival by ...
+
+    - Sex
+
+    - Age
+
+    - Class
+
+    - Sex, given class
+
+    - Age, given class
+
+
+1. Use QQ plots to assess approximate normality of time to event and BMI in the `predimed` dataset.
+
+```{r}
+library(compareGroups)
+data(predimed)
+```
+

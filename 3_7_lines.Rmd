@@ -1,0 +1,156 @@
+---
+title: "Line plots (for lab data)"
+subtitle: "with package `ggformula`"
+author: "Albert Cobos"
+output: 
+  ioslides_presentation:
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      comment = NA,
+                      fig.align='center', 
+                      fig.width = 10,
+                      fig.height = 4)
+
+```
+
+
+## Data
+
+```{r}
+library(tidyverse)
+library(ggformula)
+
+d <- rio::import("data/labs.xlsx")
+
+head(d)
+
+```
+
+
+## Patient profiles
+
+```{r}
+
+crea <- d %>% filter(var == "creatinina" & !is.na(value)) 
+
+gf_line(value ~ visit | treatment, group = ~ subject_id, 
+        data = crea, ylab = "creatinina (mg/dl)") 
+
+```
+
+## Adding reference line with `gf_hline()`
+
+```{r}
+gf_line(value ~ visit | treatment, group = ~ subject_id, 
+        data = crea, ylab = "creatinina (mg/dl)") %>% 
+  gf_hline(yintercept = 1.8, lty=3, lwd=0.5) 
+```
+
+
+## Plotting by site with `gf_facet_grid()`
+
+```{r}
+
+gf_line(value ~ visit | treatment, group = ~ subject_id, 
+        data = crea, ylab = "creatinina (mg/dl)") %>% 
+  gf_hline(yintercept = 1.8, lty=3, lwd=0.5) %>% 
+  gf_facet_grid(site ~ treatment)
+
+
+```
+
+
+## Identify patients with elevations
+
+```{r}
+
+pwe <- crea %>% filter(value > 1.8) %>% pull(subject_id) %>% unique()
+
+crea <-  crea %>% 
+  mutate(elevated = ifelse(subject_id %in% pwe, "yes", "no")) 
+
+head(crea)
+
+
+```
+
+## Using color for cases with elevations
+
+```{r}
+
+gf_line(value ~ visit | treatment, group = ~ subject_id, col = ~ elevated,
+        data = crea, ylab = "creatinina (mg/dl)") %>% 
+  gf_hline(yintercept = 1.8, lty=3, lwd=0.5) %>% 
+  gf_facet_grid(site ~ treatment) %>% gf_theme(legend.position = "none")
+
+```
+
+
+## Better assignment of color
+
+```{r}
+
+crea_plot <- gf_line(value ~ visit | treatment, group = ~ subject_id, col = ~ fct_rev(elevated),
+                     data = crea, ylab = "creatinina (mg/dl)") %>% 
+  gf_hline(yintercept = 1.8, lty=3, lwd=0.5) %>% 
+  gf_facet_grid(site ~ treatment) %>% gf_theme(legend.position = "none")
+crea_plot
+
+```
+
+
+## Labeling cases with elevations
+
+```{r}
+
+crea_plot %>% 
+  gf_label(data = filter(crea, value > 1.8), label = ~ subject_id, 
+           show.legend = FALSE, nudge_y = 1)
+
+```
+
+
+## Identifying last visits of cases with elevations
+
+```{r}
+
+ crea %>% 
+    filter(elevated == "yes") %>% 
+    group_by(subject_id) %>% 
+    summarise(visit = last(visit)) %>% 
+    ungroup() %>% 
+    left_join(crea) -> last_visits
+
+last_visits
+
+```
+
+
+## Labeling last visits only
+
+```{r}
+crea_plot %>% 
+  gf_text(data = last_visits, label = ~ subject_id, 
+           show.legend = FALSE, nudge_x = 0.2)
+```
+
+
+## Exercise
+
+1. Produce a similar plot for potassium (reference range from 2.5 to 5.5 mEq/l).
+
+1. Repeat using `gf_label()` instead of `gf_text()`. 
+
+1. Download package `ggrepel` and change the entire `gf_label()` line by this one:
+
+```{r eval = FALSE}
+gf_refine(ggrepel::geom_label_repel(data = last_visits, 
+                                    aes(label = subject_id)))
+```
+
+What is the difference?

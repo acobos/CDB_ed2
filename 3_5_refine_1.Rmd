@@ -1,0 +1,181 @@
+---
+title: "Refining graphics 1"
+subtitle: "with package `ggformula`"
+author: "Albert Cobos"
+output: 
+  ioslides_presentation:
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      comment = NA,
+                      fig.align='center', fig.height = 4)
+
+```
+
+
+## Data
+
+```{r}
+library(tidyverse)
+library(ggformula)
+
+d <- rio::import("data/hta.xlsx", sheet = "data") %>% 
+  filter(!is.na(sex)) %>% 
+  mutate(sex = factor(sex, 1:2, c("male", "female")),
+         smoke = factor(smoke, 1:4, c("current", "never", "ex-", "unknown")), 
+         bmi = round(weight / height^2, 1))
+
+```
+
+
+## Title, subtitle and axis labels
+
+```{r fig.height=4}
+plot1 <- gf_jitter(bmi ~ sex, data = d, width = 0.2, alpha = 0.4, color = ~sex,
+          title = "Body Mass Index (BMI) by sex",  subtitle = "N = 491",
+          ylab = "BMI (Kg/m^2)",  xlab = "")
+plot1
+
+```
+
+
+## Axis limits
+
+```{r fig.height=4}
+plot1 %>% 
+  gf_lims(y = c(20, 40))
+
+```
+
+## `gf_refine()`
+
+Makes `ggplot2` plot elements chainable with `%>%`.  
+Those familiar with `ggplot2` can replace:
+
+```{r eval=FALSE}
+a_plot + foo()                          # ggplot2 style: chaining with +
+a_plot %>% gf_refine(foo())             # ggformula style: chaining with %>% 
+```
+
+\
+
+\
+
+See next slide for an example using `coord_flip()`.   
+
+
+## Flipping axes:  $\quad$ `coord_flip()`
+
+```{r }
+
+plot1 %>% 
+  gf_refine(coord_flip())
+  
+```
+
+
+## Overlaying plots
+
+```{r }
+
+plot1 %>% 
+  gf_violin(fill = NA) %>% 
+  gf_refine(coord_flip())
+  
+```
+
+
+## Labelling cases:  $\quad$ `gf_text()` and `gf_label()`
+
+```{r fig.height = 3.8}
+plot2 <- gf_point(weight ~ height, data = d, alpha = 0.4, color = ~sex) %>% 
+  gf_label(data = filter(d, weight>125), label = ~pid, 
+           show.legend=FALSE, nudge_y = 5, nudge_x = - 0.03) %>% 
+  gf_text(x = 1.7, y = 145, label = "some outliers here", col = "darkgray")
+plot2
+```
+
+
+## Themes
+
+- Control the appearance of (a huge list of) non-data elements of plots.
+
+- There is a number of pre-defined themes such as:  
+    + `theme_bw()`  
+    + `theme_minimal()`  
+    + `theme_classic()`  
+    + ... (see `?theme` for the complete list)  
+    + ... (additional themes can be found in the `ggthemes` package)  
+
+\
+
+- Pre-defined themes can be applied with `gf_theme()` or `gf_refine()`.
+
+- Themes elements can be adjusted with `gf_theme()`.
+
+
+## Applying pre-defined themes 
+
+```{r }
+
+plot2 %>% 
+  gf_refine(theme_classic())
+
+```
+
+
+## Adjusting theme elements
+
+```{r}
+plot2 %>% 
+  gf_refine(theme_classic()) %>% 
+  gf_theme(legend.position = "top", legend.title = element_blank())
+
+```
+
+
+
+
+
+## Exercise
+
+- With the `predimed` data in package `compareGroups`, reproduce this graphic:
+
+    ```{r echo = FALSE}
+    library(compareGroups)
+    data(predimed)
+    set.seed(123)
+
+    p <- gf_jitter(age ~ group , data = predimed, alpha = 0.2, color = ~sex,
+                   title = "Age at enrollment by randomized treatment",
+                   subtitle = "Predimed trial (n = 6324)",
+                   xlab = "",
+                   ylab = "Age (years)") %>% 
+      gf_violin(fill = NA, col = "darkgray") %>% 
+      gf_refine(coord_flip())
+    
+    p
+
+    ```
+
+- Apply the `theme_minimal()` theme to the previous graphic.
+
+
+## Exercise (cont.)
+
+- See `?gf_hline` 
+
+- Use this function to draw reference lines at ages 55, 60  and 80:
+
+    ```{r echo = FALSE}
+    p %>% 
+      gf_theme(theme_minimal()) %>% 
+      gf_hline(yintercept = c(55, 60, 80), linetype = 2)
+
+    ```
+
+

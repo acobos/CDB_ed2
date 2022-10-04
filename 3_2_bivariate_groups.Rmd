@@ -1,0 +1,123 @@
+---
+title: "Bivariate graphics: group comparisons"
+subtitle: "with package `ggformula`"
+author: "Albert Cobos"
+output: 
+  ioslides_presentation:
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      comment = NA,
+                      fig.align = 'center',
+                      fig.height = 4)
+
+```
+
+
+## Data
+
+```{r}
+library(tidyverse)
+library(ggformula)
+library(patchwork)
+
+d <- rio::import("data/hta.xlsx", sheet = "data") %>% 
+  mutate(sex = factor(sex, 1:2, c("male", "female")),
+         smoke = factor(smoke, 1:4, c("current", "never", "ex-", "unknown")),
+         bmi = round(weight / height^2, 1))
+
+```
+
+
+## Jitter plot 
+
+```{r}
+d %>% 
+  gf_jitter(bmi ~ sex) + coord_flip()
+```
+
+
+## Jitter plot: exclude NA category
+
+```{r fig.height=4}
+d %>% 
+  filter(!is.na(sex)) %>% 
+  gf_jitter(bmi ~ sex)  + coord_flip()
+```
+
+
+## Jitter plot: $\quad$  `width` and `alpha` 
+
+```{r fig.height=4}
+
+set.seed(123)                                       # for reproducible jittering
+d %>% 
+  filter(!is.na(sex)) %>% 
+  gf_jitter(bmi ~ sex, width = .2, alpha = 0.4) + coord_flip()
+
+```
+
+
+## Boxplots
+
+```{r fig.height=4}
+d %>% 
+  filter(!is.na(sex)) %>% 
+  gf_boxplot(bmi ~ sex, data = d) + coord_flip()
+```
+
+
+## Boxplots: $\quad$  `notch` and `varwidth`
+
+```{r fig.height=4}
+
+d %>% 
+  filter(!is.na(sex)) %>% 
+  gf_boxplot(bmi ~ sex, notch = TRUE, varwidth = TRUE) + coord_flip()
+
+```
+
+## Violin plot
+
+```{r fig.height=4}
+
+d %>% 
+  filter(!is.na(sex)) %>% 
+  gf_violin(bmi ~ sex) + coord_flip()
+
+```
+
+
+## Density plots: using `fill`
+
+```{r fig.height=4}
+d %>% 
+  filter(!is.na(sex)) %>% 
+  gf_density(~ bmi, fill = ~ sex)
+
+```
+
+
+## Stacked bars
+
+```{r fig.height=4}
+dd <- d %>% filter(!is.na(sex) & smoke %in% c("current", "never", "ex-"))
+plot1 <- gf_bar( ~ sex , fill = ~ smoke, data = dd)                      # counts 
+plot2 <- gf_props(~ sex , fill = ~ smoke, data = dd, position = "fill")  # percentages
+plot1 + plot2
+```
+
+
+## Exercise
+
+1. Produce the following plots to compare the distribution of age in men and women:
+    + Jitter:  do you see any difference?
+    + Boxplot: do you see any difference?
+    + Violin: do you see any difference?
+    + Density: do you see any difference?
+
+1. Compute age groups with cutpoints `0, 40, 70, Inf`, and produce a stacked barchart to compare age gropups in  men and women. Do you see any difference?

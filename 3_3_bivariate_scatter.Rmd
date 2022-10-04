@@ -1,0 +1,119 @@
+---
+title: "Bivariate graphics: scatterplots and correlograms"
+subtitle: "with packages `ggformula` and `corrgram`"
+author: "Albert Cobos"
+output: 
+  ioslides_presentation:
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      comment = NA,
+                      fig.align='center')
+
+```
+
+
+## Data
+
+[Oropharyngeal examination to predict sleep apnea severity](https://pubmed.ncbi.nlm.nih.gov/22006776/)
+
+```{r}
+library(tidyverse)
+library(ggformula)
+library(patchwork)
+d <- rio::import("data/OSAS.xls") %>% 
+    mutate(gender = factor(gender, 1:0, c("male", "female")),
+           ftp = factor(ftp, 1:4, paste("grade", 1:4)),
+           tonsils = factor(tonsils, 0:4, paste("grade", 0:4)),
+           uvula = factor (uvula, 1:4, c("no hypertrophy", "slight hyp.", 
+                                         "moderate hyp.", "marked hyp.")))
+head(d, 2)
+
+```
+
+
+## Scatterplot
+
+```{r fig.width=10, fig.height=4}
+a <- gf_point(flow_100_r ~ flow_100_l, data = d, alpha = 0.4)
+b <- gf_point(flow_150_r ~ flow_150_l, data = d, alpha = 0.4)
+a + b
+```
+
+
+## Excluding the outlier
+
+```{r fig.width=10, fig.height=4}
+d <- d %>% filter(flow_150_r < 3000)
+a <- gf_point(flow_100_r ~ flow_100_l, data = d, alpha = 0.4)
+b <- gf_point(flow_150_r ~ flow_150_l, data = d, alpha = 0.4)
+a + b
+```
+
+
+
+## Scatterplot matrix
+
+```{r fig.width = 7, fig.height= 5}
+df <- d %>% select(contains("flow"))                   # data with only flow_* vars
+pairs(df)
+```
+
+
+## Scatterplots:  flows (left) vs sides (right)
+
+```{r fig.width = 8, fig.height= 4}
+a <- gf_point(flow_150_l ~ flow_100_l, data = d, alpha = 0.4)
+b <- gf_point(flow_150_l ~ flow_150_r, data = d, alpha = 0.4)
+a + b
+```
+
+
+## Contour plot:  flows (left) vs sides (right)
+
+```{r fig.width = 8, fig.height= 4}
+a <- gf_density2d(flow_150_l ~ flow_100_l, data = d, alpha = 0.4)
+b <- gf_density2d(flow_150_l ~ flow_150_r, data = d, alpha = 0.4)
+a + b
+```
+
+
+## Correlograms
+
+```{r fig.width = 6, fig.height= 5}
+library(corrgram)
+corrgram(df, lower.panel=panel.ellipse, upper.panel=panel.pts, text.panel=panel.txt) 
+
+```
+
+## Correlograms with Pearson's correlations
+
+```{r fig.width = 6, fig.height= 5}
+corrgram(df, lower.panel=panel.cor, upper.panel=panel.shade, text.panel=panel.txt) 
+```
+
+- packages corrplot, corrgram, and see https://r-graph-gallery.com/correlogram.html
+
+
+## Exercise {.smaller}
+
+1. Exclude the outlier and compute the following variables:
+    + `flow_100_sum': the sum of flows at 100 Pa in both sides.
+    + `flow_150_sum': the sum of flows at 150 Pa in both sides.
+    + `flow_100_dif': the difference of flows at 100 Pa (right minus left).
+    + `flow_150_dif': the difference of flows at 150 Pa (right minus left).
+
+1. Investigate the following relations:
+    + sums at 100 and 150 Pa.
+    + differences at 100 and 150 Pa.
+    + sum and difference at 100 Pa.
+    + sum and difference at 150 Pa.
+    
+1. Produce a scatterplot matrix with all four vars.
+
+1. Produce a correlogram with all four vars, having points in the lower panel and Pearson's correlations in the upper panel.
+
