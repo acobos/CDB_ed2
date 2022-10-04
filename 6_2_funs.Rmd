@@ -1,0 +1,198 @@
+---
+title: "User defined functions"
+author: "Albert Cobos"
+output: 
+  ioslides_presentation:
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning=FALSE, 
+                      error = TRUE,
+                      comment = NA,
+                      message = FALSE)
+```
+
+## User defined functions
+
+- R has lots of predefined functions, but you can define new functions as well
+
+- Define a function using function ```function()```, and assigning the result to a *name* of our choice 
+
+
+```{r eval=FALSE}
+my_function <- function() {              # function definition
+                                         #    here the R code doing something
+}                                        # end of function definition
+
+```
+
+- You will later call the function using its name
+
+```{r eval=FALSE}
+my_function()                            # function call
+
+```
+
+
+
+## A simple function
+
+We can define one (or more) argument(s) within the brackets
+
+```{r}
+my_function <- function(x) {        
+  c("mean" = mean(x),  "SD" = sd(x),  "Median" = median(x),  "IQR" = IQR(x))
+}                                  
+
+vector1 <- 1:10;  vector2 <- 11:20
+my_function(vector1) 
+my_function(vector2) 
+```
+
+## Improving the output: rounding
+
+```{r}
+my_function <- function(x) {        
+  res <- c("mean" = mean(x),  "SD" = sd(x),  "Median" = median(x),  "IQR" = IQR(x))
+  round(res, 2)
+}                                  
+
+my_function(vector1) 
+```
+
+</br>
+
+More flexibility: 
+
+Could we allow for a different number of decimals? 
+
+## Arguments with default value
+
+```{r}
+my_function <- function(x, decimals=2) {        
+  res <- c("mean" = mean(x),  "SD" = sd(x),  "Median" = median(x),  "IQR" = IQR(x))
+  round(res, decimals)
+}                                  
+
+my_function(vector1) 
+my_function(vector1, 4) 
+ 
+```
+
+
+## What the function returns
+
+A function always returns the result of its *last line* of code
+
+Why this does not produce the desired result?
+
+```{r}
+my_function <- function(x, decimals=2) { 
+  mean(x)
+  sd(x)           # last line of the function body will be returned
+}     
+
+my_function(1:5)
+```
+
+The mean was actually computed, but not returned !
+
+## Births, again
+
+```{r}
+library(mosaic)
+data(Births78)
+library(dplyr)
+d <- Births78 %>%
+  mutate(day = recode(day_of_week, 
+                      `1` = "Sun",
+                      `7` = "Sat",
+                      .default = "Working"),
+         day= factor(day, levels = c("Working", "Sat", "Sun"))) %>%
+  select( -day_of_week) #, -day_of_year)
+```
+
+
+## A first model and its graphical representation
+
+```{r fig.align='center', fig.height=3.5}
+model <- lm(births ~ day, data = d)                  # fit the model
+d$pred <- predict(model)                            # save predictions
+gf_point(births ~ date, col = ~ day, data = d) %>%    # plot the data
+  gf_line(pred ~ date)                              # with predictions
+
+```
+
+## What will you do for a different model?
+
+1. Copy paste
+2. Change what is needed: just the model formula
+
+```{r eval=FALSE}
+model <- lm(births ~ day, data = d)                  
+d$pred <- predict(model)                            
+gf_point(births ~ date, col = ~ day, data = d) %>%    
+  gf_line(pred ~ date)                              
+
+model <- lm(births ~ day + month, data = d)         # change model formula
+d$pred <- predict(model)                            
+gf_point(births ~ date, col = ~ day, data = d) %>%    
+  gf_line(pred ~ date)                         
+```
+
+It's ok, but if you need to fit other models, there is a better solution:
+
+write a function
+
+## Writing functions
+
+Methodology: 
+
+1. Solve a particular case (as we did)
+
+2. Identify the part to change, if copy paste (as we did)
+
+3. Give a name to the part to change, replace, and test
+
+4. Wrap the code inside a function, and use this name as argument
+
+## Step 3. Name the part to change, and replace
+
+```{r fig.align='center', fig.height=3.5}
+the_formula <- births ~ day + month         # give a name for the formula
+
+model <- lm(the_formula, data = d)          # replace
+d$pred <- predict(model)                            
+gf_point(births ~ date, col = ~ day, data = d) %>%    
+  gf_line(pred ~ date)                         
+```
+
+## Step 4. Wrap inside a function, with argument
+
+```{r}
+my_function <- function(the_formula) {      # start function definition (argument_name)
+  
+  model <- lm(the_formula, data = d)          
+  d$pred <- predict(model)                            
+  gf_point(births ~ date, col = ~ day, data = d) %>%    
+    gf_line(pred ~ date)                            
+  
+}                                        # function end
+
+
+```
+
+## Call the function...
+
+```{r fig.align='center'}
+my_function(births ~ day + month)
+```
+
+## ...as many times as you need
+
+```{r fig.align='center'}
+my_function(births ~ day + poly(day_of_year,5))
+```
+
