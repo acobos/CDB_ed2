@@ -1,0 +1,60 @@
+---
+title: "Statistical modeling"
+subtitle: "Introduction"
+author: "Albert Cobos"
+output: 
+  ioslides_presentation:
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      message = FALSE,
+                      warning = FALSE,
+                      comment = NA)
+
+# library(pander)
+# require(Rcmdr)
+```
+
+
+## Statistical (or probabilistic) modelling
+
+<center>
+$\quad y = f(x_1, x_2, ..., x_k) + \epsilon$
+</center>
+
+</br>
+
+- $y \quad$ *dependent*, *predicted*, or *explained* variable
+- $x \quad$ *independent*, *predictor*, or *explanatory* variables  
+- $\epsilon \quad$  *random variable* with specified distribution, e.g., $N(0,\sigma)$
+
+Useful for:
+
+- Exploration of multivariate relationships: 
+    - confouding  
+    - interactions  
+    - non-linearities  
+- Prediction
+
+
+## Model families {.smaller}
+
+A huge variety of statistical models. Some of the most common are:
+
+Model family                              $y$                     $x$'s
+--------------------------                ------------------      -----------------------
+Linear Regression Model                   continuous              continuous
+Analysis of Variance                      continuous              categorical
+General Linear Model                      continuous              continuous, categorical
+Logistic Regression Model                 categorical, 2 levels   continuous, categorical
+Multinomial Logit Model                   categorical, >2 levels  continuous, categorical
+Poisson Regression (or log-linear) Models counts                  continuous, categorical
+Cox Proportional Hazards Model (CPHM)     time to event           continuous, categorical
+--------------------------                ------------------      -----------------------
+
+<br>
+
+Genera*lized* linear model: $\quad$ includes all model families above except the CPHM.    
+
