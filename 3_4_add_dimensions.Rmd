@@ -114,6 +114,7 @@ Men (55 to 80 years of age) or women (60 to 80 years of age) with no cardiovascu
 
 1. Install and load package `compareGroups` and then run this:
 ```{r eval = FALSE}
+library(compareGroups)
 data(predimed)
 levels(predimed$group) <- c("Control", "MD+nuts", "MD+VOO") # for shorter levels
 ```
