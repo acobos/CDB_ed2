@@ -1,6 +1,6 @@
 library(tidyverse)
 library(ggformula)
-library(patchwork)
+
 
 d <- rio::import("data/hta.xlsx", sheet = "data") %>% 
   mutate(sex = factor(sex, 1:2, c("male", "female"))) %>% 
@@ -26,4 +26,4 @@ d %>%
 # to compare age gropups in  men and women. Do you see any difference?
 d %>% 
   mutate(age_group = cut(age, c(0, 40, 70, Inf))) %>% 
-  gf_props(~ sex , fill = ~ age_group, data = dd, position = "fill") 
+  gf_props(~ sex , fill = ~ age_group, position = "fill") 
