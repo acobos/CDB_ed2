@@ -13,9 +13,10 @@ knitr::opts_chunk$set(echo = FALSE,
 library(dplyr)
 library(ggformula)
 library(patchwork)
-library(pROC)
-# data
 
+
+# data
+library(pROC)
 data(aSAH)
 # converting wfns (factor) to numeric
 aSAH$wfns <- as.numeric(aSAH$wfns)
@@ -24,17 +25,17 @@ aSAH$wfns <- as.numeric(aSAH$wfns)
 
 ## Introduction
 
-Accurate early anticipation of long-term irreversible brain damage during the acute phase of patients with aneurysmal subarachnoid hemorrhage (aSAH) remains difficult. Using a combination of clinical scores together with brain injury-related biomarkers (NDKA and S100-beta), this study aimed at developing a multiparameter prognostic panel to facilitate early outcome prediction following aSAH.
+Accurate early anticipation of long-term irreversible brain damage during the acute phase of patients with aneurysmal subarachnoid hemorrhage (aSAH) remains difficult. Using a combination of clinical scores (WFNS) together with brain injury-related biomarkers (NDKA and S100-beta), this study aimed at developing a multiparameter prognostic panel to facilitate early outcome prediction following aSAH.
 
 
 ## Methods
 
 Blood samples of  `r nrow(aSAH)` were prospectively enrolled and analyzed. Bla, bla, bla...
 
-The following figure shows the distribution of markers according to the patient's outcome.
+Figure \ref{fig:jitters} shows the distribution of markers according to the patient's outcome. There is considerable overlap of the distributions in patients with poor or good outcome. Bla, bla, bla...
 
 
-```{r }
+```{r jitters, fig.align='center', fig.cap='Distribution of markers according to outcome' }
 plot1 <- gf_jitter(ndka ~ outcome, data = aSAH, width = 0.1, alpha = 0.4) + coord_flip()
 plot2 <- gf_jitter(s100b ~ outcome, data = aSAH, width = 0.1, alpha = 0.4) + coord_flip()
 plot3 <- gf_jitter(wfns ~ outcome, data = aSAH, width = 0.1, alpha = 0.4) + coord_flip()
@@ -42,54 +43,92 @@ plot3 <- gf_jitter(wfns ~ outcome, data = aSAH, width = 0.1, alpha = 0.4) + coor
 plot1 / plot2 / plot3
 ```
 
-Figure \ref{fig:rocs} displays the ROC curves for all three markers.
 
-```{r rocs, fig.align='center', fig.cap='ROC curves for all three markers' }
+Table \ref{tab:stats} summarizes the distribution of demographic variables and of the three markers according to outcome.
+
+```{r stats}
+library(compareGroups)
+descrTable(outcome ~ gender + age + wfns + s100b + ndka,
+                          data = aSAH, show.p.overall = FALSE) %>% 
+  export2md()
+
+```
+
+\
+\
+\
+\
+
+Figure \ref{fig:rocs} displays the ROC curves for all three markers. 
+
+```{r rocs, fig.align='center', fig.cap='ROC curves for all three markers', fig.width=5 }
+
 # ROC analysis
-roc1 <- roc(outcome ~ ndka, data = aSAH)
-roc2 <- roc(outcome ~ s100b, data = aSAH)
-roc3 <- roc(outcome ~ wfns, data = aSAH)
+roc_ndka <- roc(outcome ~ ndka, data = aSAH)
+roc_s100b <- roc(outcome ~ s100b, data = aSAH)
+roc_wfns <- roc(outcome ~ wfns, data = aSAH)
 
 # plot all three ROC curves
-plot(roc1, col="blue")
-plot(roc2, col="darkgreen", add = TRUE)
-plot(roc3, col="red", add = TRUE)
+
+plot(roc_ndka, col="blue")
+plot(roc_s100b, col="darkgreen", add = TRUE)
+plot(roc_wfns, col="red", add = TRUE)
 legend("bottomright", 
        legend = c("ndka", "s100b", "wfns"), 
        col = c("blue", "darkgreen", "red"),
        lwd = 2)
 ```
 
+\
+\
 
+Table \ref{tab:auc} shows the ROC AUC's of the three markers. Bla, bla, bla...
 
+```{r auc}
 
-
-```{r eval=FALSE}
-
-# compute AUC's and CI's using bootstrap (normal approximation not appropriate here)
-
-auc(roc1);  set.seed(1);  ci(roc1, method = "bootstrap") 
-auc(roc2);  set.seed(1);  ci(roc2, method = "bootstrap") 
-auc(roc3);  set.seed(1);  ci(roc3, method = "bootstrap") 
-
-ci(roc1) %>% round(2) %>% stringr::str_flatten(", ")
-stringr::str_flatten(round(ci(roc1),2), ", " )
-
+# function to compute AUC's and CI's using bootstrap
+auc_ci <- function (roc_object){
+  auc <- auc(roc_object) %>% round(2)  
+  set.seed(1);  
+  auc_ci <- ci(roc_object, method = "bootstrap") 
+  auc_lo <- auc_ci[1] %>% round(2)  
+  auc_hi <- auc_ci[3] %>% round(2)  
+  stringr::str_glue("{auc} [95% CI: {auc_lo}, {auc_hi}]")
+}
 
 # comparisons of wfns vs ndka and s100b
 set.seed(1)
-roc.test(roc3, roc1, method = "bootstrap")
+ndka_vs_wfns <- roc.test(roc_ndka, roc_wfns, method = "bootstrap")
+# ndka_vs_wfns
+# ndka_vs_wfns$p.value %>% scales::pvalue()
+
+
 set.seed(1)
-roc.test(roc3, roc2, method = "bootstrap")
+s100b_vs_wfns <- roc.test(roc_s100b, roc_wfns, method = "bootstrap")
+# s100b_vs_wfns
+# s100b_vs_wfns$p.value %>% scales::pvalue()
+
+data.frame(marker = c("ndka", 
+                      "s100b", 
+                      "wfns"),
+           AUC = c(auc_ci(roc_ndka), 
+                   auc_ci(roc_s100b), 
+                   auc_ci(roc_wfns)),
+           p = c(ndka_vs_wfns$p.value %>% scales::pvalue(),
+                 s100b_vs_wfns$p.value %>% scales::pvalue(),
+                 "-")) %>% 
+  knitr::kable(caption = "ROC AUC of markers")
+
+```
+
+
+```{r thres, fig.align='center', fig.cap='ROC curves for all three markers', fig.width=5}
 
 # ROC curve and optimal threshold
-plot.roc(roc3, col="red", 
+plot.roc(roc_wfns, col="red", 
          print.auc=TRUE, 
          print.thres = "best")
 
-# see optimal threshold
-aSAH %>% gf_boxplot(wfns ~ outcome) %>% 
-  gf_hline(yintercept = 3.5, lty=2, col = "red")
 
 ```
 
