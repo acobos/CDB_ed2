@@ -15,15 +15,16 @@ gf_jitter(bwt ~ race, data = bw, width = 0.2, alpha = 0.4,
 
 # Graphics on drug dosages
 d <- rio::import("data/doses.xlsx") %>% 
-  mutate(dose = str_extract(dose, "[:digit:]+"))
+  mutate(dose = factor(str_extract(dose, "[:digit:]+"),
+                       levels = c("25", "50", "100", "150", "200")))
 
 
-gf_barh(~ dose, data = d) +
-  d %>% 
+a <- gf_barh(~ dose, data = d)
+b <- d %>% 
   mutate(dose_range = fct_collapse(dose,
                                    "low" = c("25", "50"),
                                    "medium" = "100",
                                    "high" = c("150", "200"))) %>% 
-  gf_barh(~ fct_rev(dose_range),
-          ylab = "dose range")
+  gf_barh(~ dose_range, ylab = "dose range")
 
+a + b

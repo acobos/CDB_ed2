@@ -26,9 +26,8 @@ library(tidyverse)
 library(ggformula)
 library(patchwork)
 
-library(dplyr)
 d <- rio::import("data/hta.xlsx", sheet = "data") %>% 
-  select(age, sex, region, dx_dm) %>% 
+  select(age, sex, region) %>% 
   mutate(sex = factor(sex, 1:2, c("male", "female")),
          region = factor(region, 
                   levels = 1:17, 
@@ -79,8 +78,7 @@ mar <- d %>%
   group_by(region) %>% 
   summarize(mean_age = mean(age))        # mean age by region
 gf_point(region ~ mean_age, data = mar) +
-gf_point(fct_reorder(region, mean_age) ~ mean_age, data = mar, 
-         ylab = "", xlab = "Mean age")
+gf_point(fct_reorder(region, mean_age) ~ mean_age, data = mar, ylab = "")
 
 ```
 
@@ -115,27 +113,30 @@ d %>%
 ```
 
 
-## Factors: collapsing sparse levels 
+## Factors with sparse levels 
 
 ```{r}
-d <- data.frame(center = factor(paste("Hospital",rep(LETTERS[1:8], 
-                             times = c(51, 26, 4, 5, 6, 32, 16, 6)))))
-gf_barh(~ center %>% fct_rev(), data = d, ylab = "") +
-gf_barh(~fct_lump(center) %>% fct_infreq() %>% fct_rev(), data = d, ylab = "") 
+d <- data.frame(pid = 1:146,
+                center = factor(paste("Hospital",
+                                      rep(LETTERS[1:8], 
+                                          times = c(51, 26, 4, 5, 6, 32, 16, 6)))))
+d %>% count(center)
 ```
 
 
-## Factors: collapsing, custom threshold and label
+## Factors: collapsing sparse levels 
 
-```{r fig.height=3}
-gf_barh(~ fct_lump(center, n = 4, other_level = "Small centers") %>% fct_rev(), 
+```{r}
+gf_barh(~ center %>% fct_rev(), data = d, ylab = "") +
+gf_barh(~ fct_lump_min(center, 10) %>% fct_rev(), data = d, ylab = "") +
+gf_barh(~ fct_lump_min(center, 10, other_level = "Small centers") %>% fct_rev(), 
         data = d, ylab = "") 
 ```
 
 
 ## Exercise 
 
-- With the `birthwt` produce these graphic:
+- With the `birthwt` data, produce these graphic:
 
 ```{r echo = FALSE}
 
@@ -152,11 +153,12 @@ gf_jitter(bwt ~ race, data = bw, width = 0.2, alpha = 0.4,
 
 ## Exercise (cont.)
 
-- The following code reads data on the dosages of a drug given to patients in a study, and redefines variable `dose` so as to contain numbers only. With this data, produce the barcharts shown below.
+- The following code reads data on the dosages of a drug given to patients in a study, and redefines variable `dose` so as to contain numbers only. With this data, produce the barcharts shown below (low: 25, 50; medium: 100, high: 150, 200)
 
 ```{r }
 d <- rio::import("data/doses.xlsx") %>% 
-  mutate(dose = str_extract(dose, "[:digit:]+"))
+  mutate(dose = factor(str_extract(dose, "[:digit:]+"),
+                       levels = c("25", "50", "100", "150", "200")))
 ```
 
 ```{r echo=FALSE, fig.height=3}
@@ -167,7 +169,7 @@ d %>%
                                    "low" = c("25", "50"),
                                    "medium" = "100",
                                    "high" = c("150", "200"))) %>% 
-  gf_barh(~ fct_rev(dose_range),
+  gf_barh(~ dose_range,
           ylab = "dose range")
 
 ```
