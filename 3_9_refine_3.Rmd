@@ -52,7 +52,7 @@ gf_boxplot(GGT ~ treatment, data = d, fill = ~treatment) %>%
 ```
 
 
-## Transformations: scale
+## Transformations of values
 
 ```{r}
 gf_boxplot(GGT ~ treatment, data = d, fill = ~treatment) %>% 
