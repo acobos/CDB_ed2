@@ -61,7 +61,6 @@ gf_line(value ~ visit | treatment, group = ~ subject_id,
   gf_hline(yintercept = 1.8, lty=3, lwd=0.5) %>% 
   gf_facet_grid(site ~ treatment)
 
-
 ```
 
 
