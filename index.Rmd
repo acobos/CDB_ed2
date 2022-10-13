@@ -95,6 +95,8 @@ downloadthis::download_file(
 
 - [The R graph gallery](https://r-graph-gallery.com/)
 
+- No need to code with [ggplotgui](https://shiny.gmw.rug.nl/ggplotgui/), but you can get the R code!  
+
 \
 
 ## Comparing groups
