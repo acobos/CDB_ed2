@@ -24,7 +24,7 @@ tally(low ~ race, data = d, format = "percent")
 library(ggformula)
 gf_props( ~ race, fill = ~ low, position = "fill", data = d)
 
-# chi-square test, without continuiy correction
+# chi-square test, without continuity correction
 # (because I do not expect low expected frequencies)
 res <- chisq.test(x, correct = FALSE)
 res
