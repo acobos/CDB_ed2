@@ -94,11 +94,11 @@ Case-control     Odds ratio (OR)
 ## Risk difference (RD)
 
 ```{r}
-res <- prop.test(low ~ smoke, data = d, correct=FALSE) 
+res <- prop.test(low ~ smoke, success = "Low", data = d, correct=FALSE) 
 confint(res)
 
-# look at the proportions table to interpret prop1, prop2, and 
-# the CI of the difference (lower, upper)
+# look at the proportions table to interpret prop1, prop2 
+# CI of the difference, computed as prop1 - prop2
 tally(low ~ smoke, data = d, format="proportion", margins = TRUE)
 
 ```

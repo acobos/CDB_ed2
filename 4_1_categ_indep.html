@@ -332,14 +332,14 @@ odds ratio
 
 </article></slide><slide class=""><hgroup><h2>Risk difference (RD)</h2></hgroup><article  id="risk-difference-rd">
 
-<pre class = 'prettyprint lang-r'>res &lt;- prop.test(low ~ smoke, data = d, correct=FALSE) 
+<pre class = 'prettyprint lang-r'>res &lt;- prop.test(low ~ smoke, success = &quot;Low&quot;, data = d, correct=FALSE) 
 confint(res)</pre>
 
 <pre >     prop 1    prop 2      lower     upper level
 1 0.4054054 0.2521739 0.01607177 0.2903912  0.95</pre>
 
-<pre class = 'prettyprint lang-r'># look at the proportions table to interpret prop1, prop2, and 
-# the CI of the difference (lower, upper)
+<pre class = 'prettyprint lang-r'># look at the proportions table to interpret prop1, prop2 
+# CI of the difference, computed as prop1 - prop2
 tally(low ~ smoke, data = d, format=&quot;proportion&quot;, margins = TRUE)</pre>
 
 <pre >        smoke
