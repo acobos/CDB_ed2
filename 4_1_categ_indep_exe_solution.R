@@ -2,15 +2,14 @@
 library(tidyverse)
 
 d <- MASS::birthwt %>% 
+  select(low, race) %>% 
   mutate(race = factor(race, levels = 1:3, labels = c("white", "black", "other")),
-         low = factor(low, levels = c(1,0), labels = c("Low", "Normal")),
-         smoke = factor(smoke, levels = c(1,0), labels = c("smoker", "non_smoker")))
+         low = factor(low, levels = c(1,0), labels = c("Low", "Normal")))
 
 head(d)   
 
 
 # low birth weight related to race? ----
-
 library(mosaic)
 
 # the contingency table (saving it to x)
@@ -31,7 +30,6 @@ res
 
 # let's see expected frequencies to confirm
 res$expected          # see them
-res$expected > 5      # see if they are all > 5
 
 # compute RR
 library(epitools)
@@ -54,13 +52,14 @@ res$measure
 riskratio(t(x), rev="columns")$measure
 
 # merging black and other ----
-d <- mutate(d, race_2 = ifelse(d$race == "white", "white", "black/other"))
+d <- mutate(d, race_2 = ifelse(race == "white", "white", "black/other"))
 
 # just to verify if race_2 was correctly created
 tally(race ~ race_2, data = d)
 
 # the contingency table
 x <- tally(low ~ race_2, data = d)
+x
 
 # chi-square test
 chisq.test(x, correct = FALSE)
