@@ -50,8 +50,6 @@ gf_boxplot(bwt ~ race, data = d) %>%
 result <- aov(bwt ~ race, data = d)      # sums of squares
 anova(result)                            # ANOVA table
 
-r2 <- car::Anova(result, type=3)
-
 ```
 
 \
@@ -121,7 +119,7 @@ kruskal.test(lwt_kg ~ race, data = d)
 
 \
 
-Evidence that means of `bwt` are not all equal (p < 0.001).
+Evidence that distributions of `bwt` are not homogeneous (p < 0.001).
 
 
 ## Exercise
