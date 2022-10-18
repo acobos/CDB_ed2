@@ -33,7 +33,7 @@ We want to compare weight `pre`- and `pos`-smoking cessation
 
 If distribution of *individual differences* is about normal$^1$: $\quad$ parametric test
 
-- paired, or one-sample *t*-test, or paired *t*-test
+- paired, or one-sample *t*-test
 
 Otherwise: $\quad$ Distribution-free ("non-parametric") tests
 
