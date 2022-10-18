@@ -10,7 +10,7 @@ head(d)
 
 # inspection of distribution of differences
 gf_boxplot(difference ~ "", data=d, xlab="", ylab="difference women - men)")  %>% 
-  gf_summary(fun.y=mean, geom="point", color="red")  %>% 
+  gf_summary(fun = mean, geom="point", color="red")  %>% 
   gf_refine(coord_flip())
 
 # slightly assymetrical, no outliers, n = 191
@@ -20,5 +20,6 @@ t.test(d$difference)
 t.test(d$LE_women, d$LE_men, paired = TRUE)        # equivalent
 
 # Provide some estimate of the difference
+res <- t.test(d$LE_women, d$LE_men, paired = TRUE) 
 res$estimate
 res$conf.int
