@@ -1,0 +1,82 @@
+---
+title: "Analysis of birth weights"
+author: "Albert Cobos"
+output: 
+  ioslides_presentation:
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE,
+                      comment = NA, fig.align = 'center', fig.width = 6, fig.height = 4)
+                      
+library(tidyverse)
+library(ggformula)
+
+d <- MASS::birthwt %>%
+  mutate(low = factor(low, 
+                     levels = 1:0, 
+                     labels = c("low", "normal")),
+         race = factor(race, 
+                       levels = 1:3,
+                       labels = c("white", "black", "other")),
+         smoke = factor(smoke, 
+                        levels = 1:0, 
+                        labels = c("smoker", "non-smoker")),
+         ui = factor(ui, 
+                      levels = 1:0, 
+                      labels = c("UI", "no-UI")),
+         ht = factor(ht, 
+                     levels = 1:0, 
+                     labels = c("AHT", "no-AHT"))) %>% 
+  rename(bw = low)
+```
+
+
+## Intro and Methods
+
+
+- Analysis of the birth weight of 189 newborns at Baystate Medical Center, Springfield, Mass (1986).
+
+- Data are summarized as mean (SD) and n (%) as appropriate. 
+
+- Group comparisons: 
+    + t-test for (quantitative vars)
+    + chi-square test with Yate's correction (categorical vars). 
+
+- All tests were two-sided
+
+- A result was declared statistically significant if $p < 0.05$. 
+
+- The analysis was done with the R language (version 4.2.1).
+
+## Birth weights
+
+Birth weights ranged from 709 to 4990 grams.
+
+Mean (SD) = 2944.6 (729.2) grams. 
+
+```{r}
+gf_dens(~ bwt, data = d, 
+        color = "blue", size = 1,
+        xlab = "Birth weight (grams)") %>% 
+  gf_histogram(binwidth=500, color = "black", fill = "white") %>% 
+  gf_theme(theme_minimal())
+```
+
+
+## Birth weights according to smoking
+
+\
+
+```{r }
+gf_boxplot(bwt ~ smoke, data = d) %>% 
+  gf_summary(fun = mean, col = "red") %>% 
+  gf_refine(coord_flip()) %>% 
+  gf_theme(theme_minimal())
+
+```
+
+
+

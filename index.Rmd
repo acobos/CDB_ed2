@@ -35,6 +35,14 @@ rio::import("teaching_plan.xlsx", sheet = "index") %>%
 
 # pull(d, topic) %>% unique() 
 
+d$exe_solution <- ifelse(d$slides_title == "Rmarkdown",
+                         "[report.Rmd](6_3_rmarkdown_exe_1_solution.Rmd),  [slides.Rmd](6_3_rmarkdown_exe_2_solution.Rmd)",
+                         d$exe_solution)
+
+d$exe_solution <- ifelse(d$slides_title == "More Rmarkdown",
+                         "[.Rmd](6_4_more_rmarkdown_exe_solution.Rmd)",
+                         d$exe_solution)
+
 
 topic_tbl <- function(topic_name){
   
@@ -45,7 +53,7 @@ topic_tbl <- function(topic_name){
   kable_styling(full_width = FALSE, position = "left", 
                 bootstrap_options = "condensed") %>% 
     column_spec(1, width = "30em") %>% 
-    column_spec(2, width = "10em")
+    column_spec(2, width = "20em")
 }
 
 ```

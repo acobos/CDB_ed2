@@ -1,0 +1,146 @@
+---
+title: "More Rmarkdown"
+author: "Albert Cobos"
+output: 
+  ioslides_presentation:
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE, 
+                      message = FALSE)
+
+# packages
+library(dplyr)
+library(mosaic)
+library(ggformula)
+
+d <- MASS::birthwt %>%
+  mutate(low = factor(low, 
+                     levels = 1:0, 
+                     labels = c("low", "normal")),
+         race = factor(race, 
+                       levels = 1:3,
+                       labels = c("white", "black", "other")),
+         smoke = factor(smoke, 
+                        levels = 1:0, 
+                        labels = c("smoker", "non-smoker")),
+         ui = factor(ui, 
+                      levels = 1:0, 
+                      labels = c("UI", "no-UI")),
+         ht = factor(ht, 
+                     levels = 1:0, 
+                     labels = c("AHT", "no-AHT"))) %>% 
+  rename(bw = low)
+
+```
+
+## Tables
+
+Many packages with functions to build tables with R:
+
+- `xtable::xtable()` (useful for pdf outputs)
+
+- `knitr::kable()` and `kableExtra` (for HTML output)
+
+- `compareGroups::descrTable()` (for both pdf and HTML outputs)
+
+- ...and many more.
+
+## compareGroups::descrTable() {.smaller}
+
+```{r table1}
+library(compareGroups)
+descrTable(smoke ~ bwt + bw + race + ht + ui, data = d,
+           show.p.overall = FALSE,
+           hide.no = c("no-AHT", "no-UI")) %>%   
+  export2md(caption = "Descriptive analysis by smoking status") 
+
+```
+
+## Defining labels for variables
+
+With function `label()` from package `Hmisc`
+
+```{r}
+Hmisc::label(d$bwt) <- "Birth weight (grams)"
+Hmisc::label(d$bw) <- "Birth weight, categorized"
+Hmisc::label(d$race) <- "Race"
+Hmisc::label(d$ht) <- "Arterial hypertension"
+Hmisc::label(d$ui) <- "Uterine irritability"
+```
+
+## The result {.smaller}
+
+```{r table2, echo = TRUE}
+library(compareGroups)
+descrTable(smoke ~ bwt + bw + race + ht + ui, data = d,
+           show.p.overall = FALSE,
+           hide.no = c("no-AHT", "no-UI")) %>%   
+  export2md(caption = "Descriptive analysis by smoking status") 
+
+```
+
+## Referencing figures and tables in text
+
+`\ref{tab:chunk_name}` for tables
+
+`\ref{fig:chunk_name}` for figures
+
+\
+
+Examples:  
+
+- If a code chunk name `descriptive_analysis` produces a table, it can be referenced in text as `\ref{tab:descriptive_analysis}`
+
+- If a code chunk name `boxplot_bwt` produces a graphic, it can be referenced in text as `\ref{fig:boxplot_bwt}`
+
+\
+Tables and figures will be automatically numbered.
+
+## Inline code
+
+The output of R code can be inserted in a text paragraph with  `` `r knitr::inline_expr("expression")` ``
+
+Example:  
+
+Birth weights ranged from `` `r knitr::inline_expr("min(d$bwt)")` `` to `` `r knitr::inline_expr("max(d$bwt)")` `` grams, with mean (SD) of `` `r knitr::inline_expr("round(mean(d$bwt),1)")` `` (`` `r knitr::inline_expr("round(sd(d$bwt),1)")` ``) grams. 
+
+Becomes:
+
+Birth weights ranged from `r min(d$bwt)` to `r max(d$bwt)` grams, with mean (SD) of `r round(mean(d$bwt),1)` (`r round(sd(d$bwt),1)`) grams. 
+
+
+## Extracting results from analyses
+
+```{r }
+res <- t.test(bwt ~ smoke, data = d)
+mean_dif <- res$estimate %>% diff() %>% round(1) %>% as.character()
+mean_dif_ci <- res$conf.int %>% round(1) %>% paste(collapse=", ") 
+md_ci <- paste0(mean_dif, " [95%CI: ", mean_dif_ci, "]")
+p <- res$p.value %>% scales::pvalue()
+```
+
+The mean weight of newborns was lower in smoker than in non-smoker mothers (p = `` `r knitr::inline_expr("p")` ``), by `` `r knitr::inline_expr("md_ci")` `` grams.
+
+Becomes:
+
+The mean weight of newborns was lower in smoker than in non-smoker mothers (p = `r p`), by `r md_ci` grams.
+
+
+## Exercise
+
+Update [this .Rmd file]() of the analysis of birth weights:
+
+1. Include a table with descriptive analysis by smoking status.
+
+2. Include references to this table and to the figures in the text refering to them.
+
+3. Use inline code to report:
+    + the number of cases analysed (Introduction section).
+    + the range, mean and SD of birth weights (Results section).
+    
+4. Add a paragraph reporting the results of the t-test on the weight of newborns according to smoking status of mothers, using inline code for the $p$ value and the mean difference and its 95% CI.
+
+5. At each step use the `knit` button to verify.
