@@ -1,7 +1,9 @@
 ---
-title: "Reporting with Rmarkdown"
+title: "Reproducible research"
 author: "Albert Cobos"
-output: pdf_document
+output: 
+  ioslides_presentation:
+    widescreen: true
 ---
 
 ```{r setup, include=FALSE}
@@ -15,125 +17,223 @@ library(ggformula)
 library(patchwork)
 
 
-# data
-library(pROC)
-data(aSAH)
-# converting wfns (factor) to numeric
-aSAH$wfns <- as.numeric(aSAH$wfns)
-
 ```
 
-## Introduction
+## Reproducibility of scientific research
 
-Accurate early anticipation of long-term irreversible brain damage during the acute phase of patients with aneurysmal subarachnoid hemorrhage (aSAH) remains difficult. Using a combination of clinical scores (WFNS) together with brain injury-related biomarkers (NDKA and S100-beta), this study aimed at developing a multiparameter prognostic panel to facilitate early outcome prediction following aSAH.
+Concerns about lack of reproducibility of scientific research ([Baker, Nature 2016](https://www.nature.com/articles/533452a)).
 
-
-## Methods
-
-Blood samples of  `r nrow(aSAH)` were prospectively enrolled and analyzed. Bla, bla, bla...
-
-Figure \ref{fig:jitters} shows the distribution of markers according to the patient's outcome. There is considerable overlap of the distributions in patients with poor or good outcome. Bla, bla, bla...
-
-
-```{r jitters, fig.align='center', fig.cap='Distribution of markers according to outcome' }
-plot1 <- gf_jitter(ndka ~ outcome, data = aSAH, width = 0.1, alpha = 0.4) + coord_flip()
-plot2 <- gf_jitter(s100b ~ outcome, data = aSAH, width = 0.1, alpha = 0.4) + coord_flip()
-plot3 <- gf_jitter(wfns ~ outcome, data = aSAH, width = 0.1, alpha = 0.4) + coord_flip()
-
-plot1 / plot2 / plot3
+```{r }
+knitr::include_graphics("./images/reproducibility_crisis.PNG", dpi = 120)
+knitr::include_graphics("./images/reproducibility_causes.PNG", dpi = 120)
 ```
 
+## Computational reproducibility (lack of)
 
-Table \ref{tab:stats} summarizes the distribution of demographic variables and of the three markers according to outcome.
+Reproducibility of results when the original data is available.
 
-```{r stats}
-library(compareGroups)
-descrTable(outcome ~ gender + age + wfns + s100b + ndka,
-                          data = aSAH, show.p.overall = FALSE) %>% 
-  export2md()
+- [Ioannidis, Nature Genetics 2009](https://www.nature.com/articles/ng.295):
 
+    > In 13/35 articles at least one value could not be reproduced despite author assistance. Incomplete specification of data processing and analysis can impede analytic reproducibility. 
+
+- [Hardwike et al., RSOS 2018](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6124055/))
+
+    > For 22/35 articles all values were reproduced, but 11 required author assistance.
+    
+    > For 13/35 articles at least one value could not be reproduced despite author assistance.
+    > Suboptimal data curation, unclear analysis specification and reporting errors can impede analytic reproducibility, undermining the utility of data sharing and the credibility of scientific findings. 
+
+
+
+## Literate programming
+
+A single document (file) that combines **text** and **R code**.
+
+\
+
+R packages to help with LP:
+
+- `knitr`: report generation from combined text and R code.
+
+- `Rmarkdown`: simple formatting syntax for text and code.
+
+- `tinytext`:  needed to create pdf documents, you should install it now.
+
+
+## Creating a report
+
+In RStudio:
+
+1. `File > New file > R mardown...`
+
+2. A dialog will open, where you should:
+    + Provide a title and author in the dialog  
+    + Leave the default output format (HTML)  
+    + Click OK
+    
+3. When a new `Untitled1` tab opens, click the `Knit` button. 
+
+4. Give a name to the file: it **should not** containg blank spaces!
+
+5. A new HTML report should appear in a new window.
+
+6. This is an HTML file that has been added to your working directory.
+
+
+## Report output formats
+
+- HTML
+
+- pdf
+
+- MS Word
+
+\
+
+Unfold the `knit` button to pick the desired one.
+
+
+## Rmarkdown document (.Rmd) 
+
+Structure of an .Rmd document:
+
+- YAML header, delimited by three dashes (`---`)
+
+- Text, with R markdown formatting 
+
+- Code chunks for R code, with optional name and chunk options
+
+## YAML header
+
+Some possibilities (some of them do not work in some output formats):
+
+````
+---
+title: "Birth weight"
+author: "Albert Cobos"
+date: "04/08/2021"
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 2
+---
+````
+
+For more YAML options, see [here](https://bookdown.org/yihui/rmarkdown/html-document.html)
+
+
+## Text, with R markdown formatting 
+
+- Use hashes (`##`) for section headers: the number of hashes determine the level of header.  
+
+- `**boldface**` or `__boldface__` become **boldface**  
+
+- `*italics*`  or `_italics_` become *italics*  
+
+- `<https://cdb.clinic.cat/>` becomes <https://cdb.clinic.cat/>  
+
+- `[Clinic CDB](https://cdb.clinic.cat/)` becomes [Clinic CDB](https://cdb.clinic.cat/)
+
+- ...
+
+
+For more R markdown formatting options, see:
+
+- the [R Markdown reference guide](https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf?_ga=2.31117371.589981273.1627977413-1000639518.1610891435), or 
+
+- the [R Markdown cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf)
+
+
+## Chunk options
+
+Options affecting text output of R code:
+
+- `echo = FALSE`: to suppress the R code (default is `TRUE`, showing the R code).
+
+- `message = FALSE`: to suppress R messages (default is `TRUE`, showing messages).
+
+- `warning = FALSE`: to suppress R warnings (default is `TRUE`, showing warnings).
+
+- `error = FALSE`: to suppressed R errors (default is `TRUE`, showing errors).
+
+- `results = 'asis'`: to write text results unaltered (default is `markup`, writing text according to output format).
+
+
+## Chunk options
+
+Options affecting plots:
+
+- `fig.align = 'center'`: To center figures (default is `'default'`, which does not make any alignment adjustment; other possible values are `'left'` or `'right'`).
+
+- `fig.cap = 'A caption for the figure'`: To provide, within quotes, a caption for the figure (default is `NULL`). Figures with a caption will be automatically numbered, and can be referenced in the text (in pdf output documents).
+
+- `fig.height = ` _n_, `fig.width = ` _n_: Set the figure height and width to the number of inches provided (_n_).
+
+
+## Chunk options
+
+- Can be specified in any particular code chunk, and then they will be applied to this chunk only, other chunks remaining unaffected
+
+- Can be set with function `knitr::opts_chunk$set()` in the first code chunk, an then they will affect all subsequent code chunks (unless overwritten in a particular code chunk)
+
+Useful first code chunk:
+
+````
+```{r setup, include = FALSE}`r ''`
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE,
+                      comment=NA, fig.align = 'center')
+                     
 ```
+````
 
 \
-\
-\
-\
 
-Figure \ref{fig:rocs} displays the ROC curves for all three markers. 
+For more chunk options, see [here](https://yihui.org/knitr/options/)
 
-```{r rocs, fig.align='center', fig.cap='ROC curves for all three markers', fig.width=5 }
+## Slides presentation
 
-# ROC analysis
-roc_ndka <- roc(outcome ~ ndka, data = aSAH)
-roc_s100b <- roc(outcome ~ s100b, data = aSAH)
-roc_wfns <- roc(outcome ~ wfns, data = aSAH)
+R Markdown can be used to produce slide presentations in several output formats:
 
-# plot all three ROC curves
+- HTML: IOslides, and Slidy
 
-plot(roc_ndka, col="blue")
-plot(roc_s100b, col="darkgreen", add = TRUE)
-plot(roc_wfns, col="red", add = TRUE)
-legend("bottomright", 
-       legend = c("ndka", "s100b", "wfns"), 
-       col = c("blue", "darkgreen", "red"),
-       lwd = 2)
-```
+- pdf:  Beamer
 
-\
-\
-
-Table \ref{tab:auc} shows the ROC AUC's of the three markers. Bla, bla, bla...
-
-```{r auc}
-
-# function to compute AUC's and CI's using bootstrap
-auc_ci <- function (roc_object){
-  auc <- auc(roc_object) %>% round(2)  
-  set.seed(1);  
-  auc_ci <- ci(roc_object, method = "bootstrap") 
-  auc_lo <- auc_ci[1] %>% round(2)  
-  auc_hi <- auc_ci[3] %>% round(2)  
-  stringr::str_glue("{auc} [95% CI: {auc_lo}, {auc_hi}]")
-}
-
-# comparisons of wfns vs ndka and s100b
-set.seed(1)
-ndka_vs_wfns <- roc.test(roc_ndka, roc_wfns, method = "bootstrap")
-# ndka_vs_wfns
-# ndka_vs_wfns$p.value %>% scales::pvalue()
+- MS PowerPoint
 
 
-set.seed(1)
-s100b_vs_wfns <- roc.test(roc_s100b, roc_wfns, method = "bootstrap")
-# s100b_vs_wfns
-# s100b_vs_wfns$p.value %>% scales::pvalue()
+## Creating an IOslides presentation {.smaller}
 
-data.frame(marker = c("ndka", 
-                      "s100b", 
-                      "wfns"),
-           AUC = c(auc_ci(roc_ndka), 
-                   auc_ci(roc_s100b), 
-                   auc_ci(roc_wfns)),
-           p = c(ndka_vs_wfns$p.value %>% scales::pvalue(),
-                 s100b_vs_wfns$p.value %>% scales::pvalue(),
-                 "-")) %>% 
-  knitr::kable(caption = "ROC AUC of markers")
+In RStudio:
 
-```
+1. `File > New File > R Markdown...`
 
+2. A dialog will open, where you should:
+    + Choose `Presentation` in the left panel
+    + Provide a title and author in the dialog  
+    + Leave the default output format HTML(ioslides)  
+    + Click OK
+    
+3. When a new `Untitled1` tab opens, click the `Knit` button. 
 
-```{r thres, fig.align='center', fig.cap='ROC curves for all three markers', fig.width=5}
+4. Give a name to the file: it **should not** containg blank spaces!
 
-# ROC curve and optimal threshold
-plot.roc(roc_wfns, col="red", 
-         print.auc=TRUE, 
-         print.thres = "best")
+5. A new HTML presentation should appear in a new window.
+
+6. This is an HTML file that has been added to your working directory.
 
 
-```
+## Exercise
+
+1. Create a .pdf report on the birth weight data in `MASS::birthwt`:
+
+    + In the first setup chunk:
+        + define general chunk options
+        + load the packages you need
+        + read and prepare the data
+    + Write an **Introduction** section with some text.
+    + Write a **Methods** section with some text.
+    + Write a **Results** section with at least two graphics of your choice, and some sentences interpreting the graphics.
 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+2. Create an IOslides presentation with similar contents as exercise 1.
 
