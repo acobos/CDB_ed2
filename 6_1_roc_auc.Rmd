@@ -125,6 +125,59 @@ aSAH %>% gf_boxplot(s100b ~ outcome) %>%
 ```
 
 
+## Plotting ROC curves with ggplot2 graphic system
+
+The `plot.roc()` function uses base R graphics 
+
+To produce a ggplot2 graphic, use `ggroc()`
+
+```{r fig.align='center', fig.height=3}
+plot1 <- ggroc(roc1, col = "blue")
+plot2 <- ggroc(list(ndka=roc1, s100b=roc2))
+plot1 + plot2
+```
+
+
+## A function for plotting 95% CI bands {.smaller}
+
+Adapted from [here](https://rpubs.com/vguillem/465086).
+
+```{r}
+roc_with_ci <- function(obj) {
+  ciobj <- ci.se(obj, specificities = seq(0, 1, l = 25))
+  dat.ci <- data.frame(x = as.numeric(rownames(ciobj)),
+                       lower = ciobj[, 1],
+                       upper = ciobj[, 3])
+  
+  ggroc(obj, col = "blue") +
+    theme_minimal() +
+    geom_abline(
+      slope = 1,
+      intercept = 1,
+      linetype = "dashed",
+      alpha = 0.7,
+      color = "darkgrey"
+    ) + coord_equal() +
+    geom_ribbon(
+      data = dat.ci,
+      aes(x = x, ymin = lower, ymax = upper),
+      fill = "steelblue",
+      alpha = 0.2
+    ) + ggtitle(capture.output(obj$ci))
+} 
+
+```
+
+
+## A function for plotting 95% CI bands
+
+```{r fig.align='center'}
+roc_with_ci(roc2) %>% 
+  gf_labs(title = "s100b ROC curve with bootstrap 95% confidence bands")
+
+```
+
+
 ## Exercise
 
 Use the `aSAH` dataset in package `pROC` to analize the accuracy of `wfns` (World Federation of Neurological Surgeons) to predict poor outcome.
