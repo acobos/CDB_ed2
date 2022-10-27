@@ -110,6 +110,12 @@ downloadthis::download_file(
 ## Comparing groups
 `r topic_tbl("Comparing groups")`
 
+- [A Student’s guide to R](https://cran.r-project.org/doc/contrib/Horton+Pruim+Kaplan_MOSAIC-StudentGuide.pdf): free book on introductory and intermediate statistics with R.
+
+- Do not use histograms to assess normality: [find out why](https://statisticsbyjim.com/basics/assessing-normality-histograms-probability-plots/).
+
+- For an intuitive introduction to the bootstrap, see [this](https://statisticsbyjim.com/hypothesis-testing/bootstrapping/).
+
 \
 
 ## Predictions
