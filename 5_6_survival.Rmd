@@ -202,7 +202,7 @@ quantile(km)
 
 ## Log-rank test {.smaller}
 
-To compare survival curvces with this test, use function `surdiff()` on a formula, with the factor defining groups after the tilde.
+To compare survival curves with this test, use function `survdiff()` on a formula, with the factor defining groups after the tilde.
 
 ```{r}
 lung$sex <- factor(lung$sex, levels=1:2, labels = c("male", "female"))     # define factor for sex 
