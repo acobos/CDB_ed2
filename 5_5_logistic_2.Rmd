@@ -13,14 +13,21 @@ knitr::opts_chunk$set(echo = TRUE,
                       comment = NA,
                       message = FALSE)
 
-library(aplore3)
-d <- burn1000         # just to have shorter name for the dataframe
 
-mod_s <- glm(death ~ tbsa, data = d, family=binomial)
-mod_i <- glm(death ~ inh_inj, data = d, family=binomial)  
 
 ```
 
+## Burns data
+
+```{r}
+library(tidyverse)
+library(aplore3)
+d <- burn1000         # just to have shorter name for the dataframe
+head(d)
+
+mod_s <- glm(death ~ tbsa, data = d, family=binomial)
+mod_i <- glm(death ~ inh_inj, data = d, family=binomial)  
+```
 
 
 ## A third model with two predictors {.smaller}
@@ -57,8 +64,8 @@ Use `predict()` with option `type="response"` to get predicted probabilities
 
 ```{r}
 d$pred <- predict(mod_si,  type = "response")
-head(d[,-c(1,2)], 3)     # first 3 lines of d (subsetted to drop columns 1 and 2)
-tail(d[,-c(1,2)], 3)     # last 3 lines of d (subsetted to drop columns 1 and 2)
+arrange(d, pred) %>% head(3)    
+arrange(d, pred) %>% tail(3)   
 ```
 
 ## Assumptions 

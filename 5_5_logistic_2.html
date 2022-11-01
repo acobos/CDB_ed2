@@ -178,7 +178,25 @@ slide:not(.current) .plotly.html-widget{
           </hgroup>
   </slide>
 
-<slide class=""><hgroup><h2>A third model with two predictors</h2></hgroup><article  id="a-third-model-with-two-predictors" class="smaller">
+<slide class=""><hgroup><h2>Burns data</h2></hgroup><article  id="burns-data">
+
+<pre class = 'prettyprint lang-r'>library(tidyverse)
+library(aplore3)
+d &lt;- burn1000         # just to have shorter name for the dataframe
+head(d)</pre>
+
+<pre >  id facility death  age gender      race tbsa inh_inj flame
+1  1       11 Alive 26.6   Male     White 25.3      No   Yes
+2  2        1 Alive  2.0 Female Non-White  5.0      No    No
+3  3       12 Alive 22.0 Female Non-White  2.0      No    No
+4  4        1 Alive 37.3   Male     White  2.0      No    No
+5  5        1 Alive 52.1   Male     White  6.0      No   Yes
+6  6        6 Alive 50.2   Male     White  7.0      No    No</pre>
+
+<pre class = 'prettyprint lang-r'>mod_s &lt;- glm(death ~ tbsa, data = d, family=binomial)
+mod_i &lt;- glm(death ~ inh_inj, data = d, family=binomial)  </pre>
+
+</article></slide><slide class=""><hgroup><h2>A third model with two predictors</h2></hgroup><article  class="smaller" id="a-third-model-with-two-predictors">
 
 <pre class = 'prettyprint lang-r'>mod_si &lt;- glm(death ~ inh_inj + tbsa, data = d, family=binomial)   
 summary(mod_si)</pre>
@@ -227,7 +245,7 @@ Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&
 
 <p>AIC is similar, but penalizing model complexity: the lower the better</p>
 
-</article></slide><slide class=""><hgroup><h2>The effect of inhalation injury</h2></hgroup><article  id="the-effect-of-inhalation-injury" class="smaller">
+</article></slide><slide class=""><hgroup><h2>The effect of inhalation injury</h2></hgroup><article  class="smaller" id="the-effect-of-inhalation-injury">
 
 <pre class = 'prettyprint lang-r'>exp(coef(mod_i)); exp(coef(mod_si))</pre>
 
@@ -247,19 +265,19 @@ gf_boxplot(tbsa ~ inh_inj, data=d) + coord_flip()</pre>
 <p>Use <code>predict()</code> with option <code>type=&quot;response&quot;</code> to get predicted probabilities</p>
 
 <pre class = 'prettyprint lang-r'>d$pred &lt;- predict(mod_si,  type = &quot;response&quot;)
-head(d[,-c(1,2)], 3)     # first 3 lines of d (subsetted to drop columns 1 and 2)</pre>
+arrange(d, pred) %&gt;% head(3)    </pre>
 
-<pre >  death  age gender      race tbsa inh_inj flame       pred
-1 Alive 26.6   Male     White 25.3      No   Yes 0.17726685
-2 Alive  2.0 Female Non-White  5.0      No    No 0.04675145
-3 Alive 22.0 Female Non-White  2.0      No    No 0.03791493</pre>
+<pre >   id facility death  age gender      race tbsa inh_inj flame       pred
+1  59       10 Alive 56.2   Male Non-White  0.1      No    No 0.03317294
+2 148        9 Alive  4.9 Female     White  0.1      No    No 0.03317294
+3 417        2 Alive 31.8 Female     White  0.1      No    No 0.03317294</pre>
 
-<pre class = 'prettyprint lang-r'>tail(d[,-c(1,2)], 3)     # last 3 lines of d (subsetted to drop columns 1 and 2)</pre>
+<pre class = 'prettyprint lang-r'>arrange(d, pred) %&gt;% tail(3)   </pre>
 
-<pre >     death  age gender      race tbsa inh_inj flame      pred
-998   Dead 85.5   Male     White  4.6     Yes   Yes 0.1475035
-999   Dead 46.8   Male Non-White 47.0     Yes   Yes 0.7920008
-1000  Dead 40.8   Male     White  1.2     Yes   Yes 0.1189712</pre>
+<pre >      id facility death  age gender      race tbsa inh_inj flame      pred
+998  981        1  Dead  2.3   Male     White   95     Yes   Yes 0.9921290
+999  912        8  Dead 60.7   Male     White   97     Yes   Yes 0.9931897
+1000 904        1  Dead 43.0 Female Non-White   98     Yes   Yes 0.9936655</pre>
 
 </article></slide><slide class=""><hgroup><h2>Assumptions</h2></hgroup><article  id="assumptions">
 
@@ -281,7 +299,7 @@ head(d[,-c(1,2)], 3)     # first 3 lines of d (subsetted to drop columns 1 and 2
 <li><p>Models with 6-15 parameters, care</p></li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>Events per parameter</h2></hgroup><article  id="events-per-parameter" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Events per parameter</h2></hgroup><article  class="smaller" id="events-per-parameter">
 
 <p>How many parameters are estimated in this model?</p>
 
