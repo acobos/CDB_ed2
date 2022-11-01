@@ -47,6 +47,7 @@ AIC is similar, but penalizing model complexity: the lower the better
 ```{r fig.height=2.5, fig.align='center'}
 exp(coef(mod_i)); exp(coef(mod_si))
 
+library(ggformula)
 gf_boxplot(tbsa ~ inh_inj, data=d) + coord_flip()
 ```
 
