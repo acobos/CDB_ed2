@@ -205,8 +205,8 @@ quantile(km)
 To compare survival curves with this test, use function `survdiff()` on a formula, with the factor defining groups after the tilde.
 
 ```{r}
-lung$sex <- factor(lung$sex, levels=1:2, labels = c("male", "female"))     # define factor for sex 
-survdiff(Surv(time, status) ~ sex, data = lung)                            # note formula
+lung <- lung %>% mutate(sex = factor(sex, levels=1:2, labels = c("male", "female")))
+survdiff(Surv(time, status) ~ sex, data = lung)      # note formula
 
 ```
 
@@ -239,7 +239,7 @@ Using the `ovarian` dataset in package `survival` (see `?ovarian`):
 
 1. Create a survival object from `futime` and `fustat`, and print it.
 
-1. Use this object to fir a KM curve for each treatment group, and plot them using option `risk.table = TRUE` in the `ggsurvplot()` function call.
+1. Use this object to fit a KM curve for each treatment group, and plot them using option `risk.table = TRUE` in the `ggsurvplot()` function call.
 
 1. What is the median survival time for each treatment?
 

@@ -310,8 +310,8 @@ $upper
 
 <p>To compare survival curves with this test, use function <code>survdiff()</code> on a formula, with the factor defining groups after the tilde.</p>
 
-<pre class = 'prettyprint lang-r'>lung$sex &lt;- factor(lung$sex, levels=1:2, labels = c(&quot;male&quot;, &quot;female&quot;))     # define factor for sex 
-survdiff(Surv(time, status) ~ sex, data = lung)                            # note formula</pre>
+<pre class = 'prettyprint lang-r'>lung &lt;- lung %&gt;% mutate(sex = factor(sex, levels=1:2, labels = c(&quot;male&quot;, &quot;female&quot;)))
+survdiff(Surv(time, status) ~ sex, data = lung)      # note formula</pre>
 
 <pre >Call:
 survdiff(formula = Surv(time, status) ~ sex, data = lung)
@@ -345,7 +345,7 @@ sex=female  90       53     73.4      5.68      10.3
 <ol>
 <li><p>Define factors for <code>rx (1=&quot;A&quot;, 2=&quot;B&quot;)</code>, <code>resid.ds (1=&quot;no&quot;, 2=&quot;yes&quot;)</code> and <code>ecog.ps (1=&quot;good&quot;, 2=&quot;bad&quot;)</code>, and factor to dichotomize age, with labels &ldquo;old&rdquo; (if age &gt;=50), or &ldquo;young&rdquo; (otherwise).</p></li>
 <li><p>Create a survival object from <code>futime</code> and <code>fustat</code>, and print it.</p></li>
-<li><p>Use this object to fir a KM curve for each treatment group, and plot them using option <code>risk.table = TRUE</code> in the <code>ggsurvplot()</code> function call.</p></li>
+<li><p>Use this object to fit a KM curve for each treatment group, and plot them using option <code>risk.table = TRUE</code> in the <code>ggsurvplot()</code> function call.</p></li>
 <li><p>What is the median survival time for each treatment?</p></li>
 <li><p>What are the survival estimates at 1 and 2 years?</p></li>
 <li><p>Compare the two curves with a log-rank test.</p></li>
