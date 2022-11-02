@@ -111,6 +111,8 @@ A significant p-value means evidence of deviation from proportional hazards.
 
 Fore more thorough ways of assessing assumptions of the Cox PH model, see [this](https://www.r-bloggers.com/cox-model-assumptions/)
 
+When PH do not hold, [Accelerated Failure Time (AFT) models](https://pubmed.ncbi.nlm.nih.gov/17080754/) may be used.
+
 ## Exercise {.smaller}
 
 Prepare the `ovarian`  data as in the previous exercise.
