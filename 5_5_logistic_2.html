@@ -196,7 +196,7 @@ head(d)</pre>
 <pre class = 'prettyprint lang-r'>mod_s &lt;- glm(death ~ tbsa, data = d, family=binomial)
 mod_i &lt;- glm(death ~ inh_inj, data = d, family=binomial)  </pre>
 
-</article></slide><slide class=""><hgroup><h2>A third model with two predictors</h2></hgroup><article  class="smaller" id="a-third-model-with-two-predictors">
+</article></slide><slide class=""><hgroup><h2>A third model with two predictors</h2></hgroup><article  id="a-third-model-with-two-predictors" class="smaller">
 
 <pre class = 'prettyprint lang-r'>mod_si &lt;- glm(death ~ inh_inj + tbsa, data = d, family=binomial)   
 summary(mod_si)</pre>
@@ -245,7 +245,7 @@ Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&
 
 <p>AIC is similar, but penalizing model complexity: the lower the better</p>
 
-</article></slide><slide class=""><hgroup><h2>The effect of inhalation injury</h2></hgroup><article  class="smaller" id="the-effect-of-inhalation-injury">
+</article></slide><slide class=""><hgroup><h2>The effect of inhalation injury</h2></hgroup><article  id="the-effect-of-inhalation-injury" class="smaller">
 
 <pre class = 'prettyprint lang-r'>exp(coef(mod_i)); exp(coef(mod_si))</pre>
 
@@ -264,7 +264,7 @@ gf_boxplot(tbsa ~ inh_inj, data=d) + coord_flip()</pre>
 
 <p>Use <code>predict()</code> with option <code>type=&quot;response&quot;</code> to get predicted probabilities</p>
 
-<pre class = 'prettyprint lang-r'>d$pred &lt;- predict(mod_si,  type = &quot;response&quot;)
+<pre class = 'prettyprint lang-r'>d &lt;- d %&gt;% mutate(pred = predict(mod_si,  type = &quot;response&quot;))
 arrange(d, pred) %&gt;% head(3)    </pre>
 
 <pre >   id facility death  age gender      race tbsa inh_inj flame       pred
@@ -299,7 +299,7 @@ arrange(d, pred) %&gt;% head(3)    </pre>
 <li><p>Models with 6-15 parameters, care</p></li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>Events per parameter</h2></hgroup><article  class="smaller" id="events-per-parameter">
+</article></slide><slide class=""><hgroup><h2>Events per parameter</h2></hgroup><article  id="events-per-parameter" class="smaller">
 
 <p>How many parameters are estimated in this model?</p>
 
@@ -324,8 +324,9 @@ flameYes:tbsa:age    -0.0020     0.0017 -1.1543   0.2484</pre>
 
 </article></slide><slide class=""><hgroup><h2>Linearity on the logit scale</h2></hgroup><article  id="linearity-on-the-logit-scale">
 
-<pre class = 'prettyprint lang-r'>d$pred &lt;- predict(mod, type=&quot;response&quot;)
-d$logit &lt;- log(d$pred / (1 - d$pred))
+<pre class = 'prettyprint lang-r'>d &lt;- d %&gt;% 
+  mutate(pred = predict(mod,  type = &quot;response&quot;),
+         logit = log(pred / (1 - pred)))
 
 gf_point(logit ~ tbsa, data = d) %&gt;%
   gf_smooth(method = &quot;loess&quot;) </pre>

@@ -63,7 +63,7 @@ gf_boxplot(tbsa ~ inh_inj, data=d) + coord_flip()
 Use `predict()` with option `type="response"` to get predicted probabilities
 
 ```{r}
-d$pred <- predict(mod_si,  type = "response")
+d <- d %>% mutate(pred = predict(mod_si,  type = "response"))
 arrange(d, pred) %>% head(3)    
 arrange(d, pred) %>% tail(3)   
 ```
@@ -98,8 +98,9 @@ round(summary(mod)$coef,4)
 ## Linearity on the logit scale
 
 ```{r fig.align='center', fig.height=3.5}
-d$pred <- predict(mod, type="response")
-d$logit <- log(d$pred / (1 - d$pred))
+d <- d %>% 
+  mutate(pred = predict(mod,  type = "response"),
+         logit = log(pred / (1 - pred)))
 
 gf_point(logit ~ tbsa, data = d) %>%
   gf_smooth(method = "loess") 
