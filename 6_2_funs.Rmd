@@ -196,3 +196,24 @@ my_function(births ~ day + month)
 my_function(births ~ day + poly(day_of_year,5))
 ```
 
+
+## Exercise
+
+Write a function to produce boxplots with mean as a red dot.
+
+Use the function to produce boxplots for 
+
+- births by week day
+
+- births by month (you will need to first convert month to a factor)
+
+- age by smoking status in the `CompareGroups::predimed` dataset
+
+- BMI by sex in the `CompareGroups::predimed` dataset
+
+```{r}
+library(compareGroups)
+data(predimed)
+```
+
+
