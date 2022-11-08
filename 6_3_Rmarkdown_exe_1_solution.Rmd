@@ -1,10 +1,6 @@
 ---
 title: "An analysis of birth weights"
 author: "Albert Cobos"
-date: "07/11/2022"
-output:
-  html_document: default
-  pdf_document: default
 ---
 
 
