@@ -36,7 +36,7 @@ rio::import("teaching_plan.xlsx", sheet = "index") %>%
 # pull(d, topic) %>% unique() 
 
 d$exe_solution <- ifelse(d$slides_title == "Rmarkdown",
-                         "[report.Rmd](https://raw.githubusercontent.com/acobos/CDB_ed2/main/6_3_Rmarkdown_exe_1_solution.Rmd),  [slides.Rmd](6_3_Rmarkdown_exe_2_solution.Rmd)",
+                         "[report.Rmd](https://raw.githubusercontent.com/acobos/CDB_ed2/main/6_3_Rmarkdown_exe_1_solution.Rmd),  [slides.Rmd](https://raw.githubusercontent.com/acobos/CDB_ed2/main/6_3_Rmarkdown_exe_2_solution.Rmd)",
                          d$exe_solution)
 
 d$exe_solution <- ifelse(d$slides_title == "More Rmarkdown",
