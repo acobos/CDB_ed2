@@ -130,3 +130,6 @@ downloadthis::download_file(
 ## Miscellanea
 `r topic_tbl("Miscellanea")`
 
+- [Packages for ROC curves](https://rviews.rstudio.com/2019/03/01/some-r-packages-for-roc-curves/)
+
+- [Rmarkdown cheat sheet](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf)
