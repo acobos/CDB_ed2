@@ -1,9 +1,12 @@
 ---
-title: "Analysis of birth weights"
+title: "An analysis of birth weights"
 author: "Albert Cobos"
-date: "24/10/2022"
-output: pdf_document
+date: "07/11/2022"
+output:
+  html_document: default
+  pdf_document: default
 ---
+
 
 ```{r setup, include=FALSE}
 
@@ -38,25 +41,28 @@ We analysed the birth weight of 189 newborns recorded in the Baystate Medical Ce
 
 ## Methods
 
-Data are summarized as mean (SD) and n (%) as appropriate. For comparisons between groups the t-test and chi-square test with Yate’s continuity correction were used, for quantitative and categorical variables respectively. All tests were two-sided, and a result was declared statistically significant if $p < 0.05$. The analysis was done with the R language (version 4.2.1).
+Data are summarized as mean (SD) and n (%) as appropriate. For comparisons between groups the t-test and chi-square test with Yate’s continuity correction were used, for quantitative and categorical variables respectively. All tests were two-sided, and a result was declared statistically significant if p < 0.05. The analysis was done with the R language (version 4.2.1).
 
 ## Results
 
 Birth weights ranged from 709 to 4990 grams, with mean (SD) of 2944.6 (729.2) grams. The histogram of birth weights with overlapped density, shows a bell-shaped and quite symmetrical distribution.
 
-```{r}
+```{r birth_hist_dens, fig.cap="Histogram and density of birth weights"}
+
 gf_dens(~ bwt, data = d, 
         color = "blue", size = 1,
         xlab = "Birth weight (grams)") %>% 
   gf_histogram(binwidth=500, color = "black", fill = "white") %>% 
   gf_theme(theme_minimal())
+
 ```
 
 
 The following figure shows the boxplots of birth weights in smoking and non-smoking mothers. A shift to lower values is apparent in smoking mothers. 
 
-```{r fig.cap="Birth weight according to smoking satus of mothers during pregnancy"}
-gf_boxplot(bwt ~ smoke, data = d) %>% 
+```{r birth_smoke_boxp, fig.cap="Birth weight according to smoking satus of mothers during pregnancy"}
+
+gf_boxplot(bwt ~ smoke, data = d, ylab = "Birth weight (grams)", xlab = "") %>% 
   gf_summary(fun = mean, col = "red") %>% 
   gf_refine(coord_flip()) %>% 
   gf_theme(theme_minimal())
