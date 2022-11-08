@@ -40,7 +40,7 @@ d$exe_solution <- ifelse(d$slides_title == "Rmarkdown",
                          d$exe_solution)
 
 d$exe_solution <- ifelse(d$slides_title == "More Rmarkdown",
-                         "[.Rmd](6_4_more_Rmarkdown_exe_solution.Rmd)",
+                         "[report.Rmd](https://raw.githubusercontent.com/acobos/CDB_ed2/main/6_4_more_Rmarkdown_exe_solution.Rmd)",
                          d$exe_solution)
 
 

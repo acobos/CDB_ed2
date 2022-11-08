@@ -1,0 +1,118 @@
+---
+title: "An analysis of birth weights"
+author: "Albert Cobos"
+output: pdf_document
+---
+
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE,
+                      comment = NA, fig.align = 'center', fig.width = 4, fig.height = 2.5)
+                      
+library(tidyverse)
+library(ggformula)
+
+d <- MASS::birthwt %>%
+  mutate(low = factor(low, 
+                     levels = 1:0, 
+                     labels = c("low", "normal")),
+         race = factor(race, 
+                       levels = 1:3,
+                       labels = c("white", "black", "other")),
+         smoke = factor(smoke, 
+                        levels = 1:0, 
+                        labels = c("smoker", "non-smoker")),
+         ui = factor(ui, 
+                      levels = 1:0, 
+                      labels = c("UI", "no-UI")),
+         ht = factor(ht, 
+                     levels = 1:0, 
+                     labels = c("AHT", "no-AHT"))) %>% 
+  rename(bw = low)
+```
+
+## Introduction
+
+We analysed the birth weight of `r nrow(d)` newborns recorded in the Baystate Medical Center, Springfield, Mass during 1986, and its associations with demographic characteristics of mothers.
+
+## Methods
+
+Data are summarized as mean (SD) and n (%) as appropriate. For comparisons between groups the t-test and chi-square test with Yate’s continuity correction were used, for quantitative and categorical variables respectively. All tests were two-sided, and a result was declared statistically significant if p < 0.05. The analysis was done with the R language (version 4.2.1).
+
+## Results
+
+Table \ref{tab:descriptive_by_smoke} shows a descriptive analysis by smoking status of mothers during pregnancy. 
+
+```{r descriptive_by_smoke}
+
+Hmisc::label(d$bwt) <- "Birth weight (grams)"
+Hmisc::label(d$bw) <- "Birth weight, categorized"
+Hmisc::label(d$race) <- "Race"
+Hmisc::label(d$ht) <- "Arterial hypertension"
+Hmisc::label(d$ui) <- "Uterine irritability"
+
+library(compareGroups)
+descrTable(smoke ~ bwt + bw + race + ht + ui, data = d,
+           show.p.overall = FALSE,
+           hide.no = c("no-AHT", "no-UI")) %>%   
+  export2md(caption = "Descriptive analysis by smoking status") 
+
+```
+
+\newpage
+
+Birth weights ranged from `r paste(range(d$bwt), collapse = " to ")` grams, with mean (SD) of `r round(mean(d$bwt))` (`r round(sd(d$bwt))`) grams. The histogram of birth weights with overlapped density, shows a bell-shaped and quite symmetrical distribution (figure \ref{fig:birth_hist_dens}).
+
+```{r birth_hist_dens, fig.cap="Histogram and density of birth weights"}
+
+gf_dens(~ bwt, data = d, 
+        color = "blue", size = 1,
+        xlab = "Birth weight (grams)") %>% 
+  gf_histogram(binwidth=500, color = "black", fill = "white") %>% 
+  gf_theme(theme_minimal())
+
+```
+
+
+Figure \ref{fig:birth_smoke_boxp} shows the boxplots of birth weights in smoking and non-smoking mothers. A shift to lower values is apparent in smoking mothers. 
+
+```{r birth_smoke_boxp, fig.cap="Birth weight according to smoking satus of mothers during pregnancy"}
+
+gf_boxplot(bwt ~ smoke, data = d, ylab = "Birth weight (grams)", xlab = "") %>% 
+  gf_summary(fun = mean, col = "red") %>% 
+  gf_refine(coord_flip()) %>% 
+  gf_theme(theme_minimal())
+
+```
+
+
+```{r t_test}
+
+result <- t.test(bwt ~ smoke, data = d)
+# result$p.value
+# round(result$p.value, 3)
+
+# result$estimate
+# result$estimate[1]
+# result$estimate[2]
+# result$estimate[1] - result$estimate[2] 
+# round(result$estimate[1] - result$estimate[2])
+
+# result$conf.int
+# round(result$conf.int)
+# round(result$conf.int)[1]
+# round(result$conf.int)[2]
+
+mean_ci <- paste0(round(result$estimate[1] - result$estimate[2]),
+                  " [95% CI: ",
+                  round(result$conf.int)[1],
+                  ", ",
+                  round(result$conf.int)[2],
+                  "]")
+
+```
+
+\
+
+Birth weights tended to be lower in smoking mothers than in non-smoking mothers (t-test p = `r round(result$p.value, 3)`), with a mean difference of `r  mean_ci` grams.
