@@ -116,7 +116,6 @@ Birth weights ranged from `r min(d$bwt)` to `r max(d$bwt)` grams, with mean (SD)
 
 ```{r }
 result <- t.test(bwt ~ smoke, data = d)
-p <- result$p.value %>% round(3)
 mean_ci <- paste0(round(result$estimate[1] - result$estimate[2]),
                   " [95% CI: ",
                   round(result$conf.int)[1],
@@ -125,11 +124,11 @@ mean_ci <- paste0(round(result$estimate[1] - result$estimate[2]),
                   "]")
 ```
 
-Birth weights tended to be lower in smoking mothers than in non-smoking mothers (t-test p = `` `r knitr::inline_expr("p")` ``), with a mean difference of `` `r knitr::inline_expr("mean_ci")` `` grams.
+Birth weights tended to be lower in smoking mothers than in non-smoking mothers (t-test p = `` `r knitr::inline_expr("round(result$p.value, 3)")` ``), with a mean difference of `` `r knitr::inline_expr("mean_ci")` `` grams.
 
 Becomes:
 
-Birth weights tended to be lower in smoking mothers than in non-smoking mothers (t-test p = `r p`), with a mean difference of `r mean_ci` grams.
+Birth weights tended to be lower in smoking mothers than in non-smoking mothers (t-test p = `r round(result$p.value, 3)`), with a mean difference of `r mean_ci` grams.
 
 
 ## Exercise
