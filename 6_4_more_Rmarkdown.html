@@ -788,17 +788,20 @@ Uterine irritability
 
 </article></slide><slide class=""><hgroup><h2>Extracting results from analyses</h2></hgroup><article  id="extracting-results-from-analyses">
 
-<pre class = 'prettyprint lang-r'>res &lt;- t.test(bwt ~ smoke, data = d)
-mean_dif &lt;- res$estimate %&gt;% diff() %&gt;% round(1) %&gt;% as.character()
-mean_dif_ci &lt;- res$conf.int %&gt;% round(1) %&gt;% paste(collapse=&quot;, &quot;) 
-md_ci &lt;- paste0(mean_dif, &quot; [95%CI: &quot;, mean_dif_ci, &quot;]&quot;)
-p &lt;- res$p.value %&gt;% scales::pvalue()</pre>
+<pre class = 'prettyprint lang-r'>result &lt;- t.test(bwt ~ smoke, data = d)
+p &lt;- result$p.value %&gt;% round(3)
+mean_ci &lt;- paste0(round(result$estimate[1] - result$estimate[2]),
+                  &quot; [95% CI: &quot;,
+                  round(result$conf.int)[1],
+                  &quot;, &quot;,
+                  round(result$conf.int)[2],
+                  &quot;]&quot;)</pre>
 
-<p>The mean weight of newborns was lower in smoker than in non-smoker mothers (p = <code>`r p`</code>), by <code>`r md_ci`</code> grams.</p>
+<p>Birth weights tended to be lower in smoking mothers than in non-smoking mothers (t-test p = <code>`r p`</code>), with a mean difference of <code>`r mean_ci`</code> grams.</p>
 
 <p>Becomes:</p>
 
-<p>The mean weight of newborns was lower in smoker than in non-smoker mothers (p = 0.007), by 283.8 [95%CI: -489, -78.6] grams.</p>
+<p>Birth weights tended to be lower in smoking mothers than in non-smoking mothers (t-test p = 0.007), with a mean difference of -284 [95% CI: -489, -79] grams.</p>
 
 </article></slide><slide class=""><hgroup><h2>Exercise</h2></hgroup><article  id="exercise">
 
