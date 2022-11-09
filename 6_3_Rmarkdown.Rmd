@@ -28,20 +28,23 @@ knitr::include_graphics("./images/reproducibility_crisis.PNG", dpi = 120)
 knitr::include_graphics("./images/reproducibility_causes.PNG", dpi = 120)
 ```
 
-## Computational reproducibility (lack of)
+## Computational reproducibility (lack of) {.smaller}
 
 Reproducibility of results when the original data is available.
 
 - [Ioannidis, Nature Genetics 2009](https://www.nature.com/articles/ng.295):
 
-    > In 13/35 articles at least one value could not be reproduced despite author assistance. Incomplete specification of data processing and analysis can impede analytic reproducibility. 
+    > Evaluated 18 articles on microarray gene expression profiling published in Nature Genetics in 2005–2006. We reproduced 2, and 6 partially or with some discrepancies; **10 could not be reproduced**.
+    
+    > Failure to reproduce were mostly due to incomplete data annotation or **incomplete specification of data processing and analysis**.
 
 - [Hardwike et al., RSOS 2018](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6124055/))
 
     > For 22/35 articles all values were reproduced, but 11 required author assistance.
     
-    > For 13/35 articles at least one value could not be reproduced despite author assistance.
-    > Suboptimal data curation, unclear analysis specification and reporting errors can impede analytic reproducibility, undermining the utility of data sharing and the credibility of scientific findings. 
+    > For 13/35 articles at least one value could not be reproduced **despite author assistance**.
+    
+    > Suboptimal data curation, **unclear analysis specification and reporting errors** can impede analytic reproducibility, undermining the utility of data sharing and the credibility of scientific findings. 
 
 
 
@@ -57,7 +60,11 @@ R packages to help with LP:
 
 - `Rmarkdown`: simple formatting syntax for text and code.
 
-- `tinytext`:  needed to create pdf documents, you should install it now.
+- `tinytext`:  needed to create pdf documents.
+
+\
+
+You should install `tinytext` now !
 
 
 ## Creating a report
@@ -228,12 +235,23 @@ In RStudio:
 
     + In the first setup chunk:
         + define general chunk options
-        + load the packages you need
-        + read and prepare the data
+        + load the packages you need with `library()`
+        + read and prepare the data (see code in next slide)
     + Write an **Introduction** section with some text.
     + Write a **Methods** section with some text.
     + Write a **Results** section with at least two graphics of your choice, and some sentences interpreting the graphics.
 
 
 2. Create an IOslides presentation with similar contents as exercise 1.
+
+## Get and prepare the `MASS::birthwt` dataset
+
+```{r echo = TRUE, comment = NA}
+d <- MASS::birthwt %>% 
+  mutate(race = factor(race, levels = 1:3, labels = c("white", "black", "other")),
+         low = factor(low, levels = c(1,0), labels = c("Low", "Normal")),
+         across(c(smoke, ht, ui), factor, levels = 0:1, labels = c("no", "yes")))
+
+head(d)
+```
 
