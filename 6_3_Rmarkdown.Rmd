@@ -247,10 +247,13 @@ In RStudio:
 ## Get and prepare the `MASS::birthwt` dataset
 
 ```{r echo = TRUE, comment = NA}
-d <- MASS::birthwt %>% 
-  mutate(race = factor(race, levels = 1:3, labels = c("white", "black", "other")),
-         low = factor(low, levels = c(1,0), labels = c("Low", "Normal")),
-         across(c(smoke, ht, ui), factor, levels = 0:1, labels = c("no", "yes")))
+d <- MASS::birthwt %>%
+  mutate(low = factor(low, levels = 1:0, labels = c("low", "normal")),
+         race = factor(race, levels = 1:3, labels = c("white", "black", "other")),
+         smoke = factor(smoke, levels = 1:0, labels = c("smoker", "non-smoker")),
+         ui = factor(ui, levels = 1:0, labels = c("UI", "no-UI")),
+         ht = factor(ht, levels = 1:0, labels = c("AHT", "no-AHT"))) %>% 
+  rename(bw = low)
 
 head(d)
 ```
