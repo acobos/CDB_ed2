@@ -7,41 +7,55 @@ head(aSAH)
 class(aSAH$wfns)
 aSAH$wfns <- as.numeric(aSAH$wfns)
 class(aSAH$wfns)
+head(aSAH)
+unique(aSAH$wfns)
+
 
 # just to see distribution of wfns by outcome: clearly non-normal !
+library(ggformula)
 gf_boxplot(wfns ~ outcome, data = aSAH) +
   stat_summary(fun=mean, geom="point", color="red") + 
   coord_flip()
 
 
 # ROC analysis
-roc1 <- roc(outcome ~ ndka, data = aSAH)
-roc2 <- roc(outcome ~ s100b, data = aSAH)
-roc3 <- roc(outcome ~ wfns, data = aSAH)
+roc_ndka <- roc(outcome ~ ndka, data = aSAH)
+roc_s100b <- roc(outcome ~ s100b, data = aSAH)
+roc_wfns <- roc(outcome ~ wfns, data = aSAH)
 
 # plot all three ROC curves
-plot(roc1, col="blue")
-plot(roc2, col="darkgreen", add = TRUE)
-plot(roc3, col="red", add = TRUE)
+
+# using base R graphic system
+plot(roc_ndka, col="blue")
+plot(roc_s100b, col="darkgreen", add = TRUE)
+plot(roc_wfns, col="red", add = TRUE)
 legend("bottomright", 
        legend = c("ndka", "s100b", "wfns"), 
        col = c("blue", "darkgreen", "red"),
        lwd = 2)
 
+# using ggplot2 graphic system
+ggroc(list(ndka = roc_ndka, 
+           s100b = roc_s100b,
+           wfns = roc_wfns))  + 
+  geom_segment(aes(x = 1, xend = 0, y = 0, yend = 1), 
+               color="darkgrey", linetype="dashed")
+  
+
 # compute AUC's and CI's using bootstrap (normal approximation not appropriate here)
-auc(roc1);  set.seed(1);  ci(roc1, method = "bootstrap") 
-auc(roc2);  set.seed(1);  ci(roc2, method = "bootstrap") 
-auc(roc3);  set.seed(1);  ci(roc3, method = "bootstrap") 
+auc(roc_ndka);  set.seed(1);  ci(roc_ndka, method = "bootstrap") 
+auc(roc_s100b);  set.seed(1);  ci(roc_s100b, method = "bootstrap") 
+auc(roc_wfns);  set.seed(1);  ci(roc_wfns, method = "bootstrap") 
 
 
 # comparisons of wfns vs ndka and s100b
 set.seed(1)
-roc.test(roc3, roc1, method = "bootstrap")
+roc.test(roc_wfns, roc_ndka, method = "bootstrap")
 set.seed(1)
-roc.test(roc3, roc2, method = "bootstrap")
+roc.test(roc_wfns, roc_s100b, method = "bootstrap")
 
 # ROC curve and optimal threshold
-plot.roc(roc3, col="red", 
+plot.roc(roc_wfns, col="red", 
          print.auc=TRUE, 
          print.thres = "best")
 
