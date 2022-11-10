@@ -123,7 +123,9 @@ downloadthis::download_file(
 
 - [Survival analysis/plots cheat sheet](https://rpkgs.datanovia.com/survminer/survminer_cheatsheet.pdf)
 
-- [Regression modeling strategies](https://www.amazon.com/Regression-Modeling-Strategies-Applications-Statistics-dp-3319194240/dp/3319194240/ref=dp_ob_title_bk) is a _very_ good book on modeling (with R).
+- [Regression modeling strategies](https://www.amazon.com/Regression-Modeling-Strategies-Applications-Statistics-dp-3319194240/dp/3319194240/ref=dp_ob_title_bk), by F.Harrell, is a _very_ good book on modeling (with R).
+
+- [Elements of statistical learning](https://hastie.su.domains/Papers/ESLII.pdf), by T. Hastie, R. Tibshirani and J. Friedman, is also a very good book on both classical and modern modeling methods, such as random forest, support vector machines or neural networks.
 
 \
 
